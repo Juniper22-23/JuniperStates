@@ -70,6 +70,18 @@ public class ConeTransporter1_5 extends Mechanism {
 //    public DigitalChannel limitSwitch;
 //    public TouchSensor touchSensor;
 
+
+    // Servos on encoder wheels for retracting and unretracting them
+    public double LEFT_RETRACT_POS = 0.5;
+    public double LEFT_UNRETRACT_POS = 0.0;
+    public double RIGHT_RETRACT_POS = 0.0;
+    public double RIGHT_UNRETRACT_POS = 0.5;
+    public double FRONT_RETRACT_POS = 0.5;
+    public double FRONT_UNRETRACT_POS = 1.0;
+    public Servo leftServo;
+    public Servo rightServo;
+    public Servo frontServo;
+
     public ConeTransporter1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
         linearSlides = this.hardwareMap.get(DcMotor.class, "linearSlides");
@@ -78,6 +90,11 @@ public class ConeTransporter1_5 extends Mechanism {
 
 //        limitSwitch = this.hardwareMap.get(DigitalChannel.class, "limit switch");
 //        touchSensor = this.hardwareMap.get(TouchSensor.class, "touchSensor");
+
+        // Servos on encoder wheels for retracting and unretracting them
+        leftServo = this.hardwareMap.get(Servo.class, "leftServo");
+        rightServo = this.hardwareMap.get(Servo.class, "rightServo");
+        frontServo = this.hardwareMap.get(Servo.class, "frontServo");
     }
 
     /*public void setLights() {
@@ -224,6 +241,27 @@ public class ConeTransporter1_5 extends Mechanism {
         grip();
         setRiseLevel(0);
         lift();
+        retractOdometryServos();
+    }
+
+    /**
+     * <img src="https://static.wikia.nocookie.net/looneytunes/images/4/43/Road-runner.png/revision/latest?cb=20230106103454" width="150" height="150"></img>
+     * <p style="font-size: 12px; font-family: Arial;">Retracts the odometry servos to their respective RETRACT_POS.</p>
+     */
+    public void retractOdometryServos() {
+        leftServo.setPosition(LEFT_RETRACT_POS);
+        rightServo.setPosition(RIGHT_RETRACT_POS);
+        frontServo.setPosition(FRONT_RETRACT_POS);
+    }
+
+    /**
+     * <img src="https://static.wikia.nocookie.net/looneytunes/images/4/43/Road-runner.png/revision/latest?cb=20230106103454" width="150" height="150"></img>
+     * <p style="font-size: 12px; font-family: Arial;">Unretracts the odometry servos to their respective UNRETRACT_POS.</p>
+     */
+    public void unretractOdometryServos() {
+        leftServo.setPosition(LEFT_UNRETRACT_POS);
+        rightServo.setPosition(RIGHT_UNRETRACT_POS);
+        frontServo.setPosition(FRONT_UNRETRACT_POS);
     }
 
 

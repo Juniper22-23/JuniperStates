@@ -179,34 +179,25 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
         startHeading = Math.toRadians(270);
         drive.setPoseEstimate(new Pose2d(startX, startY, startHeading));
         TrajectorySequence Auto1plus3 = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
-                .forward(51.5)
-                .strafeRight(11.5)
+//dropping the preload__________________________________________________________________________
+                .lineToLinearHeading(new Pose2d(36, 23.5, Math.toRadians(270)))
+                .turn(Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(3);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
-                .forward(5)
+                .forward(3.5)
+                .lineToLinearHeading(new Pose2d(39.5, 12, Math.toRadians(0)))
 
-                .back(5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(55, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .forward(5.5)
+//CYCLE #1________________________________________________________________________________________
+                .lineToLinearHeading(new Pose2d(60, 12, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -218,38 +209,25 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(2)
-                .back(5)
+                .lineToLinearHeading(new Pose2d(47, 12, Math.toRadians(0)))
+                .turn(Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
-                .lineToLinearHeading(new Pose2d(24, 13.5, Math.toRadians(270)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(3);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
-                .forward(5)
+                .forward(3.5)
+                .back(3.5)
+                .turn(Math.toRadians(-90))
 
-                .back(5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(55, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .forward(5.5)
+//CYCLE #2_______________________________________________________________________________________
+                .lineToLinearHeading(new Pose2d(60, 12, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -261,38 +239,25 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(2)
-                .back(5.5)
+                .lineToLinearHeading(new Pose2d(47, 12, Math.toRadians(0)))
+                .turn(Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
-                .lineToLinearHeading(new Pose2d(24, 13.5, Math.toRadians(270)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(3);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
-                .forward(5)
+                .forward(3.5)
+                .back(3.5)
+                .turn(Math.toRadians(-90))
 
-                .back(5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(55, 12, Math.toRadians(0)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
-                .forward(5)
+//CYCLE #3________________________________________________________________________________________
+                .lineToLinearHeading(new Pose2d(60, 12, Math.toRadians(0)))
                 .UNSTABLE_addTemporalMarkerOffset(1.25, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
@@ -304,34 +269,24 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(2)
-                .back(5)
+                .lineToLinearHeading(new Pose2d(47, 12, Math.toRadians(0)))
+                .turn(Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(0);
+                    coneTransporter.setRiseLevel(1);
                     coneTransporter.lift();
                 })
-                .lineToLinearHeading(new Pose2d(24, 13.5, Math.toRadians(270)))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(3);
-                    coneTransporter.lift();
-                })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
-                .forward(5)
+                .forward(3.5)
+                .back(3.5)
 
-                .back(5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
-                })
-                .lineToLinearHeading(new Pose2d(35.5, 12, Math.toRadians(270)))
-                .back(24)
-                .strafeRight(24 * numericalTag)
-                /*.UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    IMUHeading.imuAngle = readFromIMU();
-                })*/
+//PARKING______________________________________________________________________________________
+                .strafeLeft(12)
+                .forward(24)
+                .strafeRight(24)
                 .build();
         drive.followTrajectorySequence(Auto1plus3);
 

@@ -180,18 +180,18 @@ public class Auto1plus3HighJunction extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(startX, startY, startHeading));
         TrajectorySequence Auto1plus3 = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
                 .forward(51.5)
-                .strafeRight(11.5)
+                .strafeRight(12)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setRiseLevel(3);
                     coneTransporter.lift();
                 })
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
                 .forward(5)
-
+                .waitSeconds(1)
                 .back(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setRiseLevel(-1);
@@ -229,12 +229,12 @@ public class Auto1plus3HighJunction extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
                 .forward(5)
-
+                .waitSeconds(1)
                 .back(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setRiseLevel(-1);
@@ -272,12 +272,12 @@ public class Auto1plus3HighJunction extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
                 .forward(5)
-
+                .waitSeconds(1)
                 .back(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setRiseLevel(-1);
@@ -315,12 +315,12 @@ public class Auto1plus3HighJunction extends LinearOpMode {
                     coneTransporter.lift();
                 })
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 })
                 .forward(5)
-
+                .waitSeconds(1)
                 .back(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setRiseLevel(-1);
