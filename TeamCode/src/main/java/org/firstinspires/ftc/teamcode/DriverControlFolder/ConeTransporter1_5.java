@@ -7,8 +7,9 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mechanism;
-//import org.firstinspires.ftc.teamcode.Mechanisms.LightsMechanism;
+import org.firstinspires.ftc.teamcode.Mechanisms.LightsMechanism;
 
+import java.sql.Array;
 import java.util.ArrayList;
 
 //TODO: Add fieldcenterauto for 1.5
@@ -27,7 +28,7 @@ public class ConeTransporter1_5 extends Mechanism {
 
     //    public Map<LinearSlidesLevels, Double> linearSlidesLevels;
     public double V15 = 0;
-    //public LightsMechanism lightsMechanism = new LightsMechanism(telemetry, hardwareMap);
+    public LightsMechanism lightsMechanism = new LightsMechanism(telemetry, hardwareMap);
 
     // Tele-Op
     public double LINEAR_SLIDES_LOW = 367.5;// 13.5 inches converted to mm(low junction)
@@ -70,18 +71,6 @@ public class ConeTransporter1_5 extends Mechanism {
 //    public DigitalChannel limitSwitch;
 //    public TouchSensor touchSensor;
 
-
-    // Servos on encoder wheels for retracting and unretracting them
-    public double LEFT_RETRACT_POS = 0.5;
-    public double LEFT_UNRETRACT_POS = 0.0;
-    public double RIGHT_RETRACT_POS = 0.0;
-    public double RIGHT_UNRETRACT_POS = 0.5;
-    public double FRONT_RETRACT_POS = 0.5;
-    public double FRONT_UNRETRACT_POS = 1.0;
-    public Servo leftServo;
-    public Servo rightServo;
-    public Servo frontServo;
-
     public ConeTransporter1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
         linearSlides = this.hardwareMap.get(DcMotor.class, "linearSlides");
@@ -90,27 +79,21 @@ public class ConeTransporter1_5 extends Mechanism {
 
 //        limitSwitch = this.hardwareMap.get(DigitalChannel.class, "limit switch");
 //        touchSensor = this.hardwareMap.get(TouchSensor.class, "touchSensor");
-
-        // Servos on encoder wheels for retracting and unretracting them
-        leftServo = this.hardwareMap.get(Servo.class, "leftServo");
-        rightServo = this.hardwareMap.get(Servo.class, "rightServo");
-        frontServo = this.hardwareMap.get(Servo.class, "frontServo");
     }
 
-    /*public void setLights() {
-        if (linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_15) || linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_15_IN_CONE)) {
-            lightsMechanism.runLights("magenta");
-        } else if (linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_14) || linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_14_IN_CONE)) {
-            lightsMechanism.runLights("red");
-        } else if (linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_13) || linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_13_IN_CONE)) {
-            lightsMechanism.runLights("green");
-        } else if (linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_12) || linearSlides.getTargetPosition() == equate(AUTO_LINEAR_SLIDES_12_IN_CONE)) {
-            lightsMechanism.runLights("blue");
-        } else {
-            lightsMechanism.runLights("clear");
-        }
-    }*/
-
+    //    public void setLights(){
+//        if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_15){
+//            lightsMechanism.runLights("magenta");
+//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_14){
+//            lightsMechanism.runLights("red");
+//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_13){
+//            lightsMechanism.runLights("green");
+//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_12){
+//            lightsMechanism.runLights("blue");
+//        }else{
+//            lightsMechanism.runLights("clear");
+//        }
+//    }
     public void setArrayList() {
         stackLevel.add(AUTO_LINEAR_SLIDES_15);
         stackLevel.add(AUTO_LINEAR_SLIDES_15_IN_CONE);
@@ -193,24 +176,21 @@ public class ConeTransporter1_5 extends Mechanism {
             if (arrayListIndex % 2 == 0) {
                 arrayListIndex = Math.max(arrayListIndex - 2, 0);
             } else {
-                arrayListIndex -= 1;
+                arrayListIndex-=1;
             }
             setHeight(arrayListIndex);
         }
     }
-
-    public void reset() {
+    public void reset(){
         if (arrayListIndex < 9) {
             if (!(arrayListIndex % 2 == 0)) {
-                arrayListIndex += 1;
+                arrayListIndex+=1;
             }
         }
     }
-
-    public void stackTelemetry() {
+    public void stackTelemetry(){
         stackTelemetry = telemetryLevel.get(arrayListIndex);
     }
-
     public void setHeight(int index) {
         double linearSlides_MM = stackLevel.get(index);
         linearSlides.setTargetPosition(equate(linearSlides_MM));
@@ -241,27 +221,6 @@ public class ConeTransporter1_5 extends Mechanism {
         grip();
         setRiseLevel(0);
         lift();
-        retractOdometryServos();
-    }
-
-    /**
-     * <img src="https://static.wikia.nocookie.net/looneytunes/images/4/43/Road-runner.png/revision/latest?cb=20230106103454" width="150" height="150"></img>
-     * <p style="font-size: 12px; font-family: Arial;">Retracts the odometry servos to their respective RETRACT_POS.</p>
-     */
-    public void retractOdometryServos() {
-        leftServo.setPosition(LEFT_RETRACT_POS);
-        rightServo.setPosition(RIGHT_RETRACT_POS);
-        frontServo.setPosition(FRONT_RETRACT_POS);
-    }
-
-    /**
-     * <img src="https://static.wikia.nocookie.net/looneytunes/images/4/43/Road-runner.png/revision/latest?cb=20230106103454" width="150" height="150"></img>
-     * <p style="font-size: 12px; font-family: Arial;">Unretracts the odometry servos to their respective UNRETRACT_POS.</p>
-     */
-    public void unretractOdometryServos() {
-        leftServo.setPosition(LEFT_UNRETRACT_POS);
-        rightServo.setPosition(RIGHT_UNRETRACT_POS);
-        frontServo.setPosition(FRONT_UNRETRACT_POS);
     }
 
 

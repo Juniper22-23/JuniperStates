@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.DriverControlFolder;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,6 +20,10 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     public double rightBackPower;
     public double rightFrontPower;
     public double leftFrontPower;
+    public double leftBackEncoder;
+    public double rightBackEncoder;
+    public double rightFrontEncoder;
+    public double leftFrontEncoder;
     public double rotationEffectivness = 0.7;
     public double xyEffectivness = 0.9;
     public float globalRollAngle;
@@ -26,13 +32,28 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     public FieldCenterAuto1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
     }
-    public void checkifrobotnottipping(){
-        if(globalRollAngle <= -2){
+
+    public void checkifrobotnottipping() {
+        if (globalRollAngle <= 15) {
             //Here it checks if the tip angle exceeds 8 degrees
+            rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+            leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
             leftFrontMotor.setPower(1.0);
             rightFrontMotor.setPower(1.0);
+        } else if (globalRollAngle >= 40) {
+            rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
+            leftBackMotor.setDirection(DcMotor.Direction.FORWARD);
+            rightBackMotor.setPower(1.0);
+            leftBackMotor.setPower(1.0);
+        } else {
+            rightBackMotor.setDirection(DcMotor.Direction.FORWARD);
+            rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+            leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+            leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
         }
     }
+
+
 
     public float getRoll() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -53,8 +74,6 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
             gamepadX *= STRAFE_TOGGLE_FACTOR;
             gamepadY *= STRAFE_TOGGLE_FACTOR;
         }
-
-
 
 
         // gamepadRot is negated because in math, a counterclockwise rotation is positive
@@ -80,17 +99,22 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
 //        telemetry.addData("theta: ", theta);
         double power = Math.hypot(rotatedX, rotatedY);
 //        telemetry.addData("power: ", power);
-        double sin = Math.sin(theta - Math.PI/4);
+        double sin = Math.sin(theta - Math.PI / 4);
 //        telemetry.addData("sin: ", sin);
-        double cos = Math.cos(theta - Math.PI/4);
+        double cos = Math.cos(theta - Math.PI / 4);
 //        telemetry.addData("cos: ", cos);
-        double max = Math.max(Math.abs(sin),Math.abs(cos));
+        double max = Math.max(Math.abs(sin), Math.abs(cos));
 //        telemetry.addData("max: ", max);
 
-        leftBackPower = power * sin/max + turn;
-        leftFrontPower = power * cos/max + turn;
-        rightBackPower = power * cos/max - turn;
-        rightFrontPower = power * sin/max - turn;
+        leftBackPower = power * sin / max + turn;
+        leftFrontPower = power * cos / max + turn;
+        rightBackPower = power * cos / max - turn;
+        rightFrontPower = power * sin / max - turn;
+        // Encoder values (312 RPM Motors)
+        leftBackEncoder = leftBackPower;
+        leftFrontEncoder = leftFrontPower;
+        rightBackEncoder = rightBackPower;
+        rightFrontEncoder = rightFrontPower;
 
 
         if ((power + Math.abs(turn)) > 1) {
@@ -99,7 +123,6 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
             leftBackPower /= power + Math.abs(turn);
             rightBackPower /= power + Math.abs(turn);
         }
-
 
 
         leftBackMotor.setPower(leftBackPower);

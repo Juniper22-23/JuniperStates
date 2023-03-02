@@ -134,6 +134,7 @@ public class Teleop1_5 extends LinearOpMode {
                 } else {
                     b_Press = false;
                 }
+
 //                }
 //                if (controller.dpadDown && level > 12) {
 //                    level--;
@@ -153,21 +154,21 @@ public class Teleop1_5 extends LinearOpMode {
 //                    coneTransporter.setPosLevel(inConeLevel);
 //                    coneTransporter.down();
 //                }
-                if (controller.rightTrigger) {
+                if (controller.leftTrigger) {
                     if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
                         coneTransporter.setHeight(coneTransporter.arrayListIndex);
                     } else {
                         coneTransporter.moveDown();
                     }
-                    //coneTransporter.setLights();
+//                    coneTransporter.setLights();
                     stackState = true;
-                } else if (controller.leftTrigger) {
+                } else if (controller.rightTrigger) {
                     if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
                         coneTransporter.setHeight(coneTransporter.arrayListIndex);
                     } else {
                         coneTransporter.moveUp();
                     }
-                    //coneTransporter.setLights();
+//                    coneTransporter.setLights();
                     stackState = true;
                 }
 

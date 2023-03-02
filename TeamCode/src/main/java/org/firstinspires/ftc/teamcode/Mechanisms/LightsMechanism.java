@@ -1,4 +1,3 @@
-/*
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -15,6 +14,12 @@ public class LightsMechanism extends Mechanism{
     public DigitalChannel green;
     public DigitalChannel white;
     public DigitalChannel red;
+
+    public boolean redState;
+
+    public boolean greenState;
+
+    public boolean blueState;
 
 
     public LightsMechanism(Telemetry telemetry, HardwareMap hardwareMap) {
@@ -34,9 +39,9 @@ public class LightsMechanism extends Mechanism{
     }
 
     public void runLights(String color){
-        boolean redState = false;
-        boolean greenState = false;
-        boolean blueState = false;
+        redState = false;
+        greenState = false;
+        blueState = false;
 
 
         // blue wire from port 0 purple links to BLUE
@@ -95,24 +100,32 @@ public class LightsMechanism extends Mechanism{
         green.setState(!greenState);
         red.setState(!redState);
 
+
     }
 
-    private int blueState() {
-        return 0;
+    private boolean blueState() {
+        return blueState;
     }
 
-    private int greenState() {
-        return 0;
+    private boolean greenState() {
+        return greenState;
     }
 
-    private int redState() {
-        return 0;
+    private boolean redState() {
+        return redState;
     }
+
 
     // This is the code that executes the connection of the lights in the robot
 
-    public void runLightsPattern() {
+    public void runLightsPattern() throws InterruptedException {
+        String[] colorPattern = {"red", "blue", "green", "yellow"};
+        for (int i = 0; i < colorPattern.length; i++) {
+            runLights(colorPattern[i]);
+            Thread.sleep(1000);
+        }
     }
+
 
     public int getLightInformation(){
         int lightTime = 10;
@@ -120,4 +133,3 @@ public class LightsMechanism extends Mechanism{
     }
 }
 
-*/
