@@ -34,13 +34,13 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     }
 
     public void checkifrobotnottipping() {
-        if (globalRollAngle <= 15) {
+        if (globalRollAngle <= 80) {
             //Here it checks if the tip angle exceeds 8 degrees
             rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
             leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
             leftFrontMotor.setPower(1.0);
             rightFrontMotor.setPower(1.0);
-        } else if (globalRollAngle >= 40) {
+        } else if (globalRollAngle >= 105) {
             rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
             leftBackMotor.setDirection(DcMotor.Direction.FORWARD);
             rightBackMotor.setPower(1.0);

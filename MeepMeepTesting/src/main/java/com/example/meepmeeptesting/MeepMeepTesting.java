@@ -15,72 +15,158 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity slowBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(30, 30, 5.021304017899041, Math.toRadians(60), 9.75)
+                .setConstraints(35, 35, 3.5, Math.toRadians(60), 9.75)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(36, 65.7, Math.toRadians(270)))
 
-                                .UNSTABLE_addTemporalMarkerOffset(0.25, () -> {
-                                    //coneTransporter.setArrayList();
+                                //dropping the preload__________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                                    //conetransporter.setArrayList();
                                 })
-                                .lineToLinearHeading(new Pose2d(36, 23.75, Math.toRadians(270)))
+                                .lineToLinearHeading(new Pose2d(36, 10, Math.toRadians(270)))
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
                                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setRiseLevel(1);
-                                    //coneTransporter.lift();
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
                                 })
-                                .turn(Math.toRadians(90))
-                                .forward(2.5)
+                                .back(1.5)
+//CYCLE #1________________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                                    //conetransporter.setHeight(0);
+                                })
+                                .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(0)))
                                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setGripperPosition(1.0);
-                                    //coneTransporter.grip();
+                                    //conetransporter.setHeight(1);
                                 })
-                                .back(2.5)
-                                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
-                                    //coneTransporter.setRiseLevel(0);
-                                    //coneTransporter.lift();
-                                })
-                                .turn(Math.toRadians(-90))
-                                .lineToLinearHeading(new Pose2d(36, 11.25, Math.toRadians(270)))
-                                .turn(Math.toRadians(90))
-                                //.lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(0)))
+                                .waitSeconds(.5)
                                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setHeight(0);
+                                    //conetransporter.setGripperPosition(.75);
+                                    //conetransporter.grip();
                                 })
-                                .forward(23.5)
-                                //Start of a Cycle
+                                .waitSeconds(.25)
                                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setHeight(1);
+                                    //conetransporter.setRiseLevel(1);
+                                    //conetransporter.lift();
                                 })
-                                .waitSeconds(0.5)
-                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setGripperPosition(0.75);
-                                    //coneTransporter.grip();
-                                })
-                                .waitSeconds(0.75)
-                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setRiseLevel(1);
-                                    //coneTransporter.lift();
-                                })
-                                .waitSeconds(0.75)
-                                .back(2)
-                                .strafeLeft(4)
-                                .turn(Math.toRadians(145))
-                                .forward(2.5)
-                                .strafeRight(2.25)
-                                .forward(1)
-                                //.lineToLinearHeading(new Pose2d(55, 18, Math.toRadians(145)))
-                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setGripperPosition(1.0);
-                                    //coneTransporter.grip();
-                                })
+                                .waitSeconds(.5)
                                 .back(1)
-                                .strafeLeft(2.25)
-                                .back(2.5)
-                                .turn(Math.toRadians(-145))
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
                                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                                    //coneTransporter.setHeight(0);
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
                                 })
-                                .lineToLinearHeading(new Pose2d(59.5, 11.65, Math.toRadians(0)))
-                                //End of a Cycle
+                                .back(1.5)
+//CYCLE #2_______________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                                    //conetransporter.setHeight(0);
+                                })
+                                .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(357.5)))
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setHeight(3);
+                                })
+                                .waitSeconds(.5)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setGripperPosition(.75);
+                                    //conetransporter.grip();
+                                })
+                                .waitSeconds(.25)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setRiseLevel(1);
+                                    //conetransporter.lift();
+                                })
+                                .waitSeconds(.5)
+                                .back(1)
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
+                                })
+                                .back(1.5)
+                                //CYCLE #3_______________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                                    //conetransporter.setHeight(0);
+                                })
+                                .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(355)))
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setHeight(5);
+                                })
+                                .waitSeconds(.5)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setGripperPosition(.75);
+                                    //conetransporter.grip();
+                                })
+                                .waitSeconds(.25)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setRiseLevel(1);
+                                    //conetransporter.lift();
+                                })
+                                .waitSeconds(.5)
+                                .back(1)
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
+                                })
+                                .back(1.5)
+                                //CYCLE #4_______________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                                    //conetransporter.setHeight(0);
+                                })
+                                .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(352.5)))
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setHeight(7);
+                                })
+                                .waitSeconds(.5)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setGripperPosition(.75);
+                                    //conetransporter.grip();
+                                })
+                                .waitSeconds(.25)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setRiseLevel(1);
+                                    //conetransporter.lift();
+                                })
+                                .waitSeconds(.5)
+                                .back(1)
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
+                                })
+                                .back(1.5)
+//CYCLE #5________________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                                    //conetransporter.setHeight(0);
+                                })
+                                .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(350)))
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setRiseLevel(-1);
+                                    //conetransporter.lift();
+                                })
+                                .waitSeconds(.5)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setGripperPosition(.75);
+                                    //conetransporter.grip();
+                                })
+                                .waitSeconds(.25)
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setRiseLevel(1);
+                                    //conetransporter.lift();
+                                })
+                                .waitSeconds(.5)
+                                .back(1)
+                                .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                                    //conetransporter.setGripperPosition(1.0);
+                                    //conetransporter.grip();
+                                })
+                                .back(2)
+//PARKING______________________________________________________________________________________
+                                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                                    //conetransporter.setRiseLevel(-1);
+                                    //conetransporter.lift();
+                                })
+                                .lineToLinearHeading(new Pose2d(36 + (-24*1), 12, Math.toRadians(270)))
                                 .build()
                 );
 
@@ -98,7 +184,7 @@ public class MeepMeepTesting {
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(slowBot)
-                .addEntity(fastBot)
+                //.addEntity(fastBot)
                 .start();
     }
 }

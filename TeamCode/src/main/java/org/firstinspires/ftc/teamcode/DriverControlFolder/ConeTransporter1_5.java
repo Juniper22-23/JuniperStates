@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.DriverControlFolder;
 
+import static java.lang.Thread.interrupted;
+import static java.lang.Thread.sleep;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mechanism;
 import org.firstinspires.ftc.teamcode.Mechanisms.LightsMechanism;
@@ -40,6 +46,8 @@ public class ConeTransporter1_5 extends Mechanism {
     public double ticks;
     //Autonomous
     private final double inFactor_MM = 125;
+    public  boolean automation = false;
+
     public double AUTO_LINEAR_SLIDES_12 = 165.1;// 6.5 inches converted to mm(2 stack) + 10 mm to be above the cone
     public double AUTO_LINEAR_SLIDES_13 = 196.85;// 7.75 inches converted to mm(3 stack) + 10 mm to be above the cone
     public double AUTO_LINEAR_SLIDES_14 = 228.6;// 9 inches converted to mm(4 stack) + 10 mm to be above the cone
@@ -55,8 +63,10 @@ public class ConeTransporter1_5 extends Mechanism {
     public Servo gripper;
     public double gripperPosition;
 
+
     //LINEAR SLIDES________________________________________________________________________________
     public DcMotor linearSlides;
+    public ColorSensor colorSensor1;
     public int riseLevel = 0;
     public int posLevel = 0;
     public float diameterOfSpool = 34f;
@@ -67,6 +77,17 @@ public class ConeTransporter1_5 extends Mechanism {
     public int arrayListIndex = -1;
     public String stackTelemetry;
 
+    // Servos on encoder wheels for retracting and unretracting them
+    public double LEFT_RETRACT_POS = 0.5;
+    public double LEFT_UNRETRACT_POS = 0.0;
+    public double RIGHT_RETRACT_POS = 0.0;
+    public double RIGHT_UNRETRACT_POS = 0.5;
+    public double FRONT_RETRACT_POS = 0.5;
+    public double FRONT_UNRETRACT_POS = 1.0;
+    public Servo leftServo;
+    public Servo rightServo;
+    public Servo frontServo;
+
     //LIMIT SWITCH_________________________________________________________________________________
 //    public DigitalChannel limitSwitch;
 //    public TouchSensor touchSensor;
@@ -76,9 +97,14 @@ public class ConeTransporter1_5 extends Mechanism {
         linearSlides = this.hardwareMap.get(DcMotor.class, "linearSlides");
         linearSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gripper = this.hardwareMap.get(Servo.class, "gripper");
+        colorSensor1 = this.hardwareMap.get(ColorSensor.class, "cs1");
 
 //        limitSwitch = this.hardwareMap.get(DigitalChannel.class, "limit switch");
 //        touchSensor = this.hardwareMap.get(TouchSensor.class, "touchSensor");
+        // Servos on encoder wheels for retracting and unretracting them
+        leftServo = this.hardwareMap.get(Servo.class, "leftServo");
+        rightServo = this.hardwareMap.get(Servo.class, "rightServo");
+        frontServo = this.hardwareMap.get(Servo.class, "frontServo");
     }
 
     //    public void setLights(){
@@ -188,6 +214,7 @@ public class ConeTransporter1_5 extends Mechanism {
             }
         }
     }
+
     public void stackTelemetry(){
         stackTelemetry = telemetryLevel.get(arrayListIndex);
     }
@@ -221,7 +248,36 @@ public class ConeTransporter1_5 extends Mechanism {
         grip();
         setRiseLevel(0);
         lift();
+        retractOdometryServos();
     }
 
+    boolean isSensing = false;
+    public void coneSense() throws InterruptedException {
 
+            if((colorSensor1.red() >= 3000 || colorSensor1.blue() >= 3000) && automation){
+                linearSlides.setPower(0);
+                setGripperPosition(0.75);
+                grip();
+                sleep(75);
+                linearSlides.setTargetPosition(equate(AUTO_LINEAR_SLIDES_15));
+                linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                linearSlides.setPower(1);
+                automation = false;
+            } else{
+                linearSlides.setTargetPosition(equate(0));
+                linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                linearSlides.setPower(1);
+            }
+    }
+    public void retractOdometryServos() {
+        leftServo.setPosition(LEFT_RETRACT_POS);
+        rightServo.setPosition(RIGHT_RETRACT_POS);
+        frontServo.setPosition(FRONT_RETRACT_POS);
+    }
+
+    public void unretractOdometryServos() {
+        leftServo.setPosition(LEFT_UNRETRACT_POS);
+        rightServo.setPosition(RIGHT_UNRETRACT_POS);
+        frontServo.setPosition(FRONT_UNRETRACT_POS);
+    }
 }

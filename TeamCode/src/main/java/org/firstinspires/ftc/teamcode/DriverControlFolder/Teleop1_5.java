@@ -17,11 +17,12 @@ public class Teleop1_5 extends LinearOpMode {
     private ConeTransporter1_5 coneTransporter;
     // Check if B is pressed
     private boolean b_Press = false;
+    public boolean isConeSensed = false;
+    public int triggerPressCount = 0;
     private boolean stackState = true;
 
     public enum TIP {
-        TIPPING,
-        NOT_TIPPING
+        TIPPING, NOT_TIPPING, ON_STACKS
     }
 
     public void runOpMode() {
@@ -61,7 +62,7 @@ public class Teleop1_5 extends LinearOpMode {
                 double gamepadRot;
                 boolean rotationToggle = false;
                 boolean strafeToggle = false;
-                if (tip == TIP.NOT_TIPPING) {
+                if (tip == TIP.NOT_TIPPING || tip == TIP.ON_STACKS) {
                     if (Math.abs(controller.gamepad1X) > 0.01) {
                         gamepadX = controller.gamepad1X;
                     } else if (Math.abs(controller.gamepad2X) > 0.01) {
@@ -102,18 +103,21 @@ public class Teleop1_5 extends LinearOpMode {
                 if (controller.y) {
                     coneTransporter.reset();
                     stackState = false;
+                    triggerPressCount = 0;
                     coneTransporter.setRiseLevel(3);
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.lift();
                 } else if (controller.a) {
                     coneTransporter.reset();
                     stackState = false;
+                    triggerPressCount = 0;
                     coneTransporter.setRiseLevel(1);
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.lift();
                 } else if (controller.x) {
                     coneTransporter.reset();
                     stackState = false;
+                    triggerPressCount = 0;
                     coneTransporter.setRiseLevel(2);
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.lift();
@@ -135,6 +139,7 @@ public class Teleop1_5 extends LinearOpMode {
                     b_Press = false;
                 }
 
+
 //                }
 //                if (controller.dpadDown && level > 12) {
 //                    level--;
@@ -153,34 +158,71 @@ public class Teleop1_5 extends LinearOpMode {
 //                    inConeLevel++;
 //                    coneTransporter.setPosLevel(inConeLevel);
 //                    coneTransporter.down();
+////                }
+//                if (controller.leftTrigger) {
+//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
+//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
+//                    } else {
+//                        coneTransporter.moveDown();
+//                    }
+////                    coneTransporter.setLights();
+//                    stackState = true;
+//                } else if (controller.rightTrigger) {
+//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
+//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
+//                    } else {
+//                        coneTransporter.moveUp();
+//                    }
+////                    coneTransporter.setLights();
+//                    stackState = true;
 //                }
-                if (controller.leftTrigger) {
-                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-                    } else {
-                        coneTransporter.moveDown();
-                    }
-//                    coneTransporter.setLights();
-                    stackState = true;
-                } else if (controller.rightTrigger) {
-                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-                    } else {
-                        coneTransporter.moveUp();
-                    }
-//                    coneTransporter.setLights();
-                    stackState = true;
-                }
 
+                if (controller.leftTrigger) {
+                    if (triggerPressCount == 0) {
+                        coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                        triggerPressCount++;
+                    } else if (triggerPressCount == 1) {
+                        coneTransporter.automation = true;
+                        triggerPressCount++;
+                    } else if (triggerPressCount > 1) {
+                        triggerPressCount = 0;
+
+                    }
+                    tip = TIP.ON_STACKS;
+                } else if (controller.rightTrigger) {
+                    if(triggerPressCount != 1){
+                     triggerPressCount++;
+                    }
+                    coneTransporter.automation = false;
+                    coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+
+                    tip = TIP.NOT_TIPPING;
+                }
+                if (coneTransporter.automation) {
+
+
+                    coneTransporter.coneSense();
+
+
+                }
+                telemetry.addData("Red", coneTransporter.colorSensor1.red());
+                telemetry.addData("Blue", coneTransporter.colorSensor1.blue());
+                telemetry.addData("Green", coneTransporter.colorSensor1.green());
+                telemetry.update();
 
                 //GRIPPER__________________________________________________________________________________
 
                 if (controller.leftBumper && !(controller.rightBumper)) {
+                    triggerPressCount = 0;
                     coneTransporter.setGripperPosition(.75);
                     coneTransporter.grip();
                 }
+/*                if (controller.leftBumper && !(controller.rightBumper)) {
+                    coneTransporter.coneSense();
+                }*/
 
                 if (controller.rightBumper && !(controller.leftBumper)) {
+                    triggerPressCount = 0;
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 }
@@ -192,18 +234,20 @@ public class Teleop1_5 extends LinearOpMode {
                 telemetry.addData("-", "tip is activated");
 
                 float roll = fieldCenterAuto.getRoll();
-                if (roll <= 10) {
-                    tip = TIP.TIPPING;
-                    fieldCenterAuto.checkifrobotnottipping();
-                } else if (roll >= 45) {
-                    tip = TIP.TIPPING;
-                    fieldCenterAuto.checkifrobotnottipping();
-                } else {
-                    tip = TIP.NOT_TIPPING;
-                    fieldCenterAuto.rightBackMotor.setDirection(DcMotor.Direction.FORWARD);
-                    fieldCenterAuto.rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
-                    fieldCenterAuto.leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
-                    fieldCenterAuto.leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+                if (tip != TIP.ON_STACKS) {
+                    if (roll <= 75) {
+                        tip = TIP.TIPPING;
+                        fieldCenterAuto.checkifrobotnottipping();
+                    } else if (roll >= 110) {
+                        tip = TIP.TIPPING;
+                        fieldCenterAuto.checkifrobotnottipping();
+                    } else {
+                        tip = TIP.NOT_TIPPING;
+                        fieldCenterAuto.rightBackMotor.setDirection(DcMotor.Direction.FORWARD);
+                        fieldCenterAuto.rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+                        fieldCenterAuto.leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+                        fieldCenterAuto.leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+                    }
                 }
 
                 coneTransporter.stackTelemetry();

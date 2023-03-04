@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.AutonomousFolder;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -22,6 +23,8 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
 
     private OpenCvCamera camera;
     private Detection detection;
+    private BNO055IMU imu;
+
 
     public static double imuAngle;
 
@@ -64,6 +67,9 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         coneTransporter = new ConeTransporter1_5(telemetry, hardwareMap);
         timer = new ElapsedTime();
+
+        imu = this.hardwareMap.get(BNO055IMU.class, "imu");
+        initializeIMU();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -307,6 +313,12 @@ public class Auto1plus3LowNoStrafe extends LinearOpMode {
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+    }
+    public void initializeIMU() {
+        // don't touch please
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
     }
 
     public double readFromIMU() {
