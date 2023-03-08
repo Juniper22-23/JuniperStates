@@ -39,7 +39,7 @@ public class ConeTransporter1_5 extends Mechanism {
     // Tele-Op
     public double LINEAR_SLIDES_LOW = 367.5;// 13.5 inches converted to mm(low junction)
     public double LINEAR_SLIDES_MEDIUM = 627.5;// 23.5 inches converted to mm(medium junction)
-    public double LINEAR_SLIDES_HIGH = 862.5;// 33.5 inches converted to mm(high junction) 2349
+    public double LINEAR_SLIDES_HIGH = 867.5;// 33.5 inches converted to mm(high junction) 2349
     public double LINEAR_SLIDES_NORM = 100;
     public double LINEAR_SLIDES_IN_CONE = 0;
     public double LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
@@ -202,7 +202,7 @@ public class ConeTransporter1_5 extends Mechanism {
             if (arrayListIndex % 2 == 0) {
                 arrayListIndex = Math.max(arrayListIndex - 2, 0);
             } else {
-                arrayListIndex-=1;
+                arrayListIndex -= 1;
             }
             setHeight(arrayListIndex);
         }
@@ -250,13 +250,20 @@ public class ConeTransporter1_5 extends Mechanism {
         lift();
         retractOdometryServos();
     }
+    public void lightUpdate(){
+        if (gripper.getPosition() == 0.75) {
+            lightsMechanism.runLights("blue");
+        }
+        else {
+            lightsMechanism.runLights("white");
+        }
+}
 
-    boolean isSensing = false;
     public void coneSense() throws InterruptedException {
 
             if((colorSensor1.red() >= 3000 || colorSensor1.blue() >= 3000) && automation){
                 linearSlides.setPower(0);
-                setGripperPosition(0.75);
+                setGripperPosition(0.75 );
                 grip();
                 sleep(75);
                 linearSlides.setTargetPosition(equate(AUTO_LINEAR_SLIDES_15));

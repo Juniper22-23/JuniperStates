@@ -19,7 +19,7 @@ public class Teleop1_5 extends LinearOpMode {
     private boolean b_Press = false;
     public boolean isConeSensed = false;
     public int triggerPressCount = 0;
-    private boolean stackState = true;
+    private boolean stackState = false;
 
     public enum TIP {
         TIPPING, NOT_TIPPING, ON_STACKS
@@ -178,33 +178,62 @@ public class Teleop1_5 extends LinearOpMode {
 //                }
 
                 if (controller.leftTrigger) {
-                    if (triggerPressCount == 0) {
-                        coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
-                        triggerPressCount++;
-                    } else if (triggerPressCount == 1) {
-                        coneTransporter.automation = true;
-                        triggerPressCount++;
-                    } else if (triggerPressCount > 1) {
-                        triggerPressCount = 0;
+                    stackState = true;
+                    if(stackState) {
+                        if (triggerPressCount == 0) {
+                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                            coneTransporter.automation = false;
+                            triggerPressCount++;
+                        } else if (triggerPressCount == 1) {
+                            coneTransporter.setGripperPosition(1.0);
+                            coneTransporter.grip();
+                            coneTransporter.automation = true;
+                            triggerPressCount++;
+                        } else if(triggerPressCount == 2){
+                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                            coneTransporter.automation = false;
+                            triggerPressCount++;
+                        }else if (triggerPressCount > 1) {
+                            triggerPressCount = 0;
 
+                        }
                     }
                     tip = TIP.ON_STACKS;
                 } else if (controller.rightTrigger) {
-                    if(triggerPressCount != 1){
-                     triggerPressCount++;
+                    stackState = true;
+                    if(stackState) {
+                        if (triggerPressCount == 2 || triggerPressCount == 0) {
+                            coneTransporter.automation = false;
+                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                            triggerPressCount++;
+                        }
+                        tip = TIP.NOT_TIPPING;
                     }
-                    coneTransporter.automation = false;
-                    coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
-
-                    tip = TIP.NOT_TIPPING;
                 }
-                if (coneTransporter.automation) {
+                if (coneTransporter.automation && stackState) {
 
 
                     coneTransporter.coneSense();
 
 
                 }
+//                if (controller.rightTrigger) {
+//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
+//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
+//                    } else {
+//                        coneTransporter.moveDown();
+//                    }
+//                    //coneTransporter.setLights();
+//                    stackState = true;
+//                } else if (controller.leftTrigger) {
+//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
+//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
+//                    } else {
+//                        coneTransporter.moveUp();
+//                    }
+//                    //coneTransporter.setLights();
+//                    stackState = true;
+//                }
                 telemetry.addData("Red", coneTransporter.colorSensor1.red());
                 telemetry.addData("Blue", coneTransporter.colorSensor1.blue());
                 telemetry.addData("Green", coneTransporter.colorSensor1.green());
@@ -226,6 +255,9 @@ public class Teleop1_5 extends LinearOpMode {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.grip();
                 }
+
+                coneTransporter.lightUpdate();
+
                 //Program for touch sensor
 //                if(coneTransporter.touchSensor.isPressed() && coneTransporter.riseLevel == -1){
 //                    coneTransporter.setGripperPosition(.75);
