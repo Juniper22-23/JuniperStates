@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Controller;
 import java.util.Objects;
 
 @TeleOp(name = "Tele-op(1.5)", group = "Tele-Op")
-public class Teleop1_5 extends LinearOpMode {
+public class Teleop1_7_1 extends LinearOpMode {
 
     // declare class variables here
     private Controller controller;
@@ -127,6 +127,7 @@ public class Teleop1_5 extends LinearOpMode {
                 if (controller.b & !b_Press) {
                     b_Press = true;
                     stackState = false;
+                    triggerPressCount = 0;
                     coneTransporter.reset();
                     if (coneTransporter.linearSlides.getTargetPosition() == coneTransporter.equate(100)) {
                         coneTransporter.setRiseLevel(-1);

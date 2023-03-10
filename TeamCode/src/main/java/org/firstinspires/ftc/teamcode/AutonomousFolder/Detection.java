@@ -225,7 +225,8 @@ class Detection extends OpenCvPipeline
         }
 
         // Base lines
-        //Imgproc.line(buf, projectedPoints[0], projectedPoints[1], blue, thickness);
+        //Imgproc.line(buf, projectedPoints[0],
+        // projectedPoints[1], blue, thickness);
         //Imgproc.line(buf, projectedPoints[1], projectedPoints[2], blue, thickness);
         //Imgproc.line(buf, projectedPoints[2], projectedPoints[3], blue, thickness);
         //Imgproc.line(buf, projectedPoints[3], projectedPoints[0], blue, thickness);

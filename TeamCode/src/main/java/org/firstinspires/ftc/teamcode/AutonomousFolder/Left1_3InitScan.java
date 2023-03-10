@@ -20,7 +20,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Autonomous
-public class Left1_5 extends LinearOpMode {
+public class Left1_3InitScan extends LinearOpMode {
     private OpenCvCamera camera;
     private Detection detection;
     private BNO055IMU imu;
@@ -48,6 +48,7 @@ public class Left1_5 extends LinearOpMode {
     public double startX;
     public double startY;
     public double startHeading;
+    private boolean runLoop = true;
     private int numberOfCycles = 1;
     private int numberOfCones = 15;
     @Override
@@ -68,7 +69,6 @@ public class Left1_5 extends LinearOpMode {
             public void onOpened() {
                 camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
             }
-
             @Override
             public void onError(int errorCode) {
             }
@@ -86,7 +86,7 @@ public class Left1_5 extends LinearOpMode {
                 coneTransporter.setGripperPosition(.75);
                 coneTransporter.grip();
                 sleep(2000);
-                coneTransporter.setRiseLevel(1);
+                coneTransporter.setRiseLevel(-100);
                 coneTransporter.lift();
                 sleep(2000);
                 coneTransportedSetup = true;
@@ -124,56 +124,62 @@ public class Left1_5 extends LinearOpMode {
             telemetry.update();
             sleep(20);
         }
-
-            /*
-             * The START command just came in: now work off the latest snapshot acquired
-             * during the init loop.
-             */
-            /* Update the telemetry */
-            if (tagOfInterest != null) {
-                telemetry.addLine("Tag snapshot:\n");
-                tagToTelemetry(tagOfInterest);
-                telemetry.update();
-            } else {
-                telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-                telemetry.update();
+        /*
+         * The START command just came in: now work off the latest snapshot acquired
+         * during the init loop.
+         */
+        /* Update the telemetry */
+        if (tagOfInterest != null) {
+            telemetry.addLine("Tag snapshot:\n");
+            tagToTelemetry(tagOfInterest);
+            telemetry.update();
+        } else {
+            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
+            telemetry.update();
+        }
+        /* Start Loop */
+        double numericalTag = 0;
+        if (tagOfInterest != null) {
+            if (tagOfInterest.id == LEFT) {
+                numericalTag = tagOfInterest.id - 2;
+            } else if (tagOfInterest.id == MIDDLE) {
+                numericalTag = 0.001;
+            } else if (tagOfInterest.id == RIGHT) {
+                numericalTag = tagOfInterest.id - 2;
             }
-            /* Start Loop */
-            double numericalTag = 0;
-            if (tagOfInterest != null) {
-                if (tagOfInterest.id == LEFT) {
-                    numericalTag = tagOfInterest.id - 2;
-                } else if (tagOfInterest.id == MIDDLE) {
-                    numericalTag = 0.001;
-                } else if (tagOfInterest.id == RIGHT) {
-                    numericalTag = tagOfInterest.id - 2;
-                }
-            } else {
-                numericalTag = -1;
-            }
+        } else{
+            numericalTag = -1;
+        }
         timer.reset();
-        while (timer.time() <= 28) {
             startX = 36;
             startY = 65;
             startHeading = Math.toRadians(270);
             drive.setPoseEstimate(new Pose2d(startX, startY, startHeading));
-            TrajectorySequence Auto1plus5 = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
-                    //dropping the preload__________________________________________________________________________
+            TrajectorySequence Auto1plus3 = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
+//dropping the preload__________________________________________________________________________
                     .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                         coneTransporter.setArrayList();
                     })
-                    .lineToLinearHeading(new Pose2d(36, 10, Math.toRadians(270)), SampleMecanumDrive.getVelocityConstraint(48.0, 3.5, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(48.0))
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)), SampleMecanumDrive.getVelocityConstraint(35, 2.5, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(35))
+                    .lineToLinearHeading(new Pose2d(36, 40, Math.toRadians(270)))
+                    .lineToLinearHeading(new Pose2d(36, 10, Math.toRadians(270)))
+                    .lineToLinearHeading(new Pose2d(48, 12, Math.toRadians(90)), SampleMecanumDrive.getVelocityConstraint(30.0, 2.5, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(30))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        coneTransporter.setRiseLevel(1);
+                        coneTransporter.lift();
+                    })
+                    .waitSeconds(1)
+                    .forward(2.5)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setGripperPosition(1.0);
                         coneTransporter.grip();
                     })
-                    .back(1.5)
+                    .back(2)
 //CYCLE #1________________________________________________________________________________________
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         coneTransporter.setHeight(0);
                     })
-                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(0)))
+                    .lineToLinearHeading(new Pose2d(58.15, 11.25, Math.toRadians(0)))
+                    .forward(1)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setHeight(1);
                     })
@@ -182,14 +188,15 @@ public class Left1_5 extends LinearOpMode {
                         coneTransporter.setGripperPosition(.75);
                         coneTransporter.grip();
                     })
-                    .waitSeconds(0.15)
+                    .waitSeconds(.25)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setRiseLevel(1);
                         coneTransporter.lift();
                     })
-                    .waitSeconds(.25)
-                    .back(1.5)
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                    .waitSeconds(.5)
+                    .back(2)
+                    .lineToLinearHeading(new Pose2d(48, 12.5, Math.toRadians(90)))
+                    .forward(2)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setGripperPosition(1.0);
                         coneTransporter.grip();
@@ -199,7 +206,8 @@ public class Left1_5 extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         coneTransporter.setHeight(0);
                     })
-                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(357.5)))
+                    .lineToLinearHeading(new Pose2d(58.15, 11.25, Math.toRadians(357.5)))
+                    .forward(1)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setHeight(3);
                     })
@@ -208,24 +216,26 @@ public class Left1_5 extends LinearOpMode {
                         coneTransporter.setGripperPosition(.75);
                         coneTransporter.grip();
                     })
-                    .waitSeconds(0.15)
+                    .waitSeconds(.25)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setRiseLevel(1);
                         coneTransporter.lift();
                     })
-                    .waitSeconds(.25)
-                    .back(1.5)
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                    .waitSeconds(.5)
+                    .back(2)
+                    .lineToLinearHeading(new Pose2d(48, 12.5, Math.toRadians(90)))
+                    .forward(2)
                     .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                         coneTransporter.setGripperPosition(1.0);
                         coneTransporter.grip();
                     })
                     .back(2)
-                    //CYCLE #3_______________________________________________________________________________________
+//CYCLE #3________________________________________________________________________________________
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         coneTransporter.setHeight(0);
                     })
-                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(355)))
+                    .lineToLinearHeading(new Pose2d(58.15, 11.25, Math.toRadians(355)))
+                    .forward(1)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setHeight(5);
                     })
@@ -234,91 +244,60 @@ public class Left1_5 extends LinearOpMode {
                         coneTransporter.setGripperPosition(.75);
                         coneTransporter.grip();
                     })
-                    .waitSeconds(0.15)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setRiseLevel(1);
-                        coneTransporter.lift();
-                    })
                     .waitSeconds(.25)
-                    .back(1.5)
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        coneTransporter.setGripperPosition(1.0);
-                        coneTransporter.grip();
-                    })
-                    .back(2)
-                    //CYCLE #4_______________________________________________________________________________________
-                    .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
-                        coneTransporter.setHeight(0);
-                    })
-                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(352.5)))
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setHeight(7);
-                    })
-                    .waitSeconds(.25)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setGripperPosition(.75);
-                        coneTransporter.grip();
-                    })
-                    .waitSeconds(0.25)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setRiseLevel(1);
-                        coneTransporter.lift();
-                    })
-                    .waitSeconds(.25)
-                    .back(1.5)
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        coneTransporter.setGripperPosition(1.0);
-                        coneTransporter.grip();
-                    })
-                    .back(2)
-//CYCLE #5________________________________________________________________________________________
-                    .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
-                        coneTransporter.setHeight(0);
-                    })
-                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(350)))
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setRiseLevel(-1);
-                        coneTransporter.lift();
-                    })
-                    .waitSeconds(.25)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        coneTransporter.setGripperPosition(.75);
-                        coneTransporter.grip();
-                    })
-                    .waitSeconds(0.25)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setRiseLevel(1);
                         coneTransporter.lift();
                     })
                     .waitSeconds(.5)
-                    .back(1.5)
-                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                    .back(2)
+                    .lineToLinearHeading(new Pose2d(48, 12.5, Math.toRadians(90)))
+                    .forward(2)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         coneTransporter.setGripperPosition(1.0);
                         coneTransporter.grip();
                     })
-                    .back(2)
+/*//CYCLE #4_______________________________________________________________________________________
+                    .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                        //conetransporter.setHeight(0);
+                    })
+                    .lineToLinearHeading(new Pose2d(59.5, 11.25, Math.toRadians(352.5)))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        //conetransporter.setHeight(7);
+                    })
+                    .waitSeconds(.5)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        //conetransporter.setGripperPosition(.75);
+                        //conetransporter.grip();
+                    })
+                    .waitSeconds(.25)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        //conetransporter.setRiseLevel(1);
+                        //conetransporter.lift();
+                    })
+                    .waitSeconds(.5)
+                    .back(1)
+                    .lineToLinearHeading(new Pose2d(48, 14.5, Math.toRadians(90)))
+                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                        //conetransporter.setGripperPosition(1.0);
+                        //conetransporter.grip();
+                    })
+                    .back(1.5)*/
+                    //PARKING______________________________________________________________________________________
+                    .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                        coneTransporter.setRiseLevel(-1);
+                        coneTransporter.lift();
+                    })
+                    .lineToLinearHeading(new Pose2d(34 + (-24 * numericalTag), 15, Math.toRadians(270 + (90 * (Math.min(numericalTag,0) + 1)))), SampleMecanumDrive.getVelocityConstraint(48.0, 3.0, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(48.0))
                     .build();
-            drive.followTrajectorySequence(Auto1plus5);
-        }
+            drive.followTrajectorySequence(Auto1plus3);
 
-        TrajectorySequence parking = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
-                //PARKING______________________________________________________________________________________
 
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
-                })
-                .lineToLinearHeading(new Pose2d(36 + (-24 * numericalTag), 15, Math.toRadians(270)), SampleMecanumDrive.getVelocityConstraint(48.0, 5.0, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(48.0))
-                .build();
-            drive.followTrajectorySequence(parking);
+        while(opModeIsActive()){
             coneTransporter.retractOdometryServos();
             IMUHeading.imuAngle = readFromIMU();
-            telemetry.clear();
-            telemetry.addData("IMUHeading.imuAngle: ", Math.toDegrees(IMUHeading.imuAngle));
-            telemetry.update();
+
+        }
     }
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));

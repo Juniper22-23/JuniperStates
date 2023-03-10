@@ -41,6 +41,7 @@ public class ConeTransporter1_5 extends Mechanism {
     public double LINEAR_SLIDES_MEDIUM = 627.5;// 23.5 inches converted to mm(medium junction)
     public double LINEAR_SLIDES_HIGH = 867.5;// 33.5 inches converted to mm(high junction) 2349
     public double LINEAR_SLIDES_NORM = 100;
+    public double LINEAR_SLIDES_INIT = 25;
     public double LINEAR_SLIDES_IN_CONE = 0;
     public double LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
     public double ticks;
@@ -182,6 +183,11 @@ public class ConeTransporter1_5 extends Mechanism {
             linearSlides.setPower(linearSlidesSpeed);
         } else if (riseLevel == -1) {
             LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_IN_CONE;
+            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
+            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            linearSlides.setPower(linearSlidesSpeed);
+        }else if (riseLevel == -100) {
+            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_INIT;
             linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
             linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             linearSlides.setPower(linearSlidesSpeed);
