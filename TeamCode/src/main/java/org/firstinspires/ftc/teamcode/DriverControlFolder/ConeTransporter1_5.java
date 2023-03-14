@@ -37,12 +37,12 @@ public class ConeTransporter1_5 extends Mechanism {
     public LightsMechanism lightsMechanism = new LightsMechanism(telemetry, hardwareMap);
 
     // Tele-Op
-    public double LINEAR_SLIDES_LOW = 367.5;// 13.5 inches converted to mm(low junction)
-    public double LINEAR_SLIDES_MEDIUM = 627.5;// 23.5 inches converted to mm(medium junction)
-    public double LINEAR_SLIDES_HIGH = 867.5;// 33.5 inches converted to mm(high junction) 2349
-    public double LINEAR_SLIDES_NORM = 100;
-    public double LINEAR_SLIDES_INIT = 25;
-    public double LINEAR_SLIDES_IN_CONE = 0;
+    public double LINEAR_SLIDES_LOW = 372.5;// 13.5 inches converted to mm(low junction)
+    public double LINEAR_SLIDES_MEDIUM = 632.5;// 23.5 inches converted to mm(medium junction)
+    public double LINEAR_SLIDES_HIGH = 895;// 33.5 inches converted to mm(high junction) 2349
+    public double LINEAR_SLIDES_NORM = 105;
+    public double LINEAR_SLIDES_INIT = 30;
+    public double LINEAR_SLIDES_IN_CONE = 5;
     public double LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
     public double ticks;
     //Autonomous

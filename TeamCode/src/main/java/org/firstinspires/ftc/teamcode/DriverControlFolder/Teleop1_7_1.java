@@ -129,7 +129,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                     stackState = false;
                     triggerPressCount = 0;
                     coneTransporter.reset();
-                    if (coneTransporter.linearSlides.getTargetPosition() == coneTransporter.equate(100)) {
+                    if (coneTransporter.linearSlides.getTargetPosition() == coneTransporter.equate(105)) {
                         coneTransporter.setRiseLevel(-1);
                     } else {
                         coneTransporter.setRiseLevel(0);
