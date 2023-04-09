@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Controller;
 import org.firstinspires.ftc.teamcode.Mechanism;
 
+@Config
 public class LinearSlidesMechanism extends Mechanism{
 /*
 Rotations needed for each level:
@@ -18,8 +21,7 @@ Rotations needed for each level:
 */
 
 
-
-    private DcMotor linearSlides;
+    private DcMotorEx linearSlides;
 
     public float diameterOfSpool = 34f;
     public float linearSlidesSpeed = 0.75f;
@@ -33,12 +35,13 @@ Rotations needed for each level:
     public int ticksAsInt;
     public int currentTick;
 
+    public static double p = 0, i = 0, d = 0;
+    public static double f = 0;
+
     public LinearSlidesMechanism(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
-
-        linearSlides = this.hardwareMap.get(DcMotor.class, "linearSlides");
+        linearSlides = this.hardwareMap.get(DcMotorEx.class, "linearSlides");
         linearSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlides.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -76,6 +79,7 @@ Rotations needed for each level:
         telemetry.addData(">", "LinearSlidesCurrentTick: " + currentTick);
         telemetry.addData(">", "Tick: " + ticksAsInt);
         telemetry.addData(">", "Power: " + linearSlidesSpeed);
+        telemetry.addData("target: ", linearSlides.getTargetPosition());
     }
 
 

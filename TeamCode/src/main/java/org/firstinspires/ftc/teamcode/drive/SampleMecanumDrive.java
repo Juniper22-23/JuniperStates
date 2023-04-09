@@ -57,7 +57,7 @@ import java.util.List;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(16, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(16, 3, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(22, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1.081081081081081;
@@ -133,7 +133,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        // setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
         //setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
         trajectorySequenceRunner = new TrajectorySequenceRunner(

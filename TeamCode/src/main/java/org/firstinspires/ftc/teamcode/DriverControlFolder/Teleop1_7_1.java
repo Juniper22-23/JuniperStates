@@ -95,12 +95,16 @@ public class Teleop1_7_1 extends LinearOpMode {
                     telemetry.addData("leftFrontPower: ", fieldCenterAuto.leftFrontPower);
                     telemetry.addData("rightBackPower: ", fieldCenterAuto.rightBackPower);
                     telemetry.addData("rightFrontPower: ", fieldCenterAuto.rightFrontPower);
+                    telemetry.addData("Loop Timer ", fieldCenterAuto.loopTimer);
+                    telemetry.addData("OP motor speed Left Front", fieldCenterAuto.leftFrontPowerOP);
+
 
 
                 }
 
                 //CONETRANSPORTER___________________________________________________________________________
                 if (controller.y) {
+                    coneTransporter.automation = false;
                     coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
@@ -108,6 +112,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.lift();
                 } else if (controller.a) {
+                    coneTransporter.automation = false;
                     coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
@@ -115,6 +120,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                     coneTransporter.setGripperPosition(1.0);
                     coneTransporter.lift();
                 } else if (controller.x) {
+                    coneTransporter.automation = false;
                     coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
@@ -125,6 +131,7 @@ public class Teleop1_7_1 extends LinearOpMode {
 
                 //This will check if b is pressed if yes then it will check the position of the slides and decide where it should go
                 if (controller.b & !b_Press) {
+                    coneTransporter.automation = false;
                     b_Press = true;
                     stackState = false;
                     triggerPressCount = 0;
@@ -177,47 +184,21 @@ public class Teleop1_7_1 extends LinearOpMode {
 ////                    coneTransporter.setLights();
 //                    stackState = true;
 //                }
-
                 if (controller.leftTrigger) {
-                    stackState = true;
-                    if(stackState) {
-                        if (triggerPressCount == 0) {
-                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                        if(!stackState && (coneTransporter.linearSlides.getTargetPosition() != coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15))){
                             coneTransporter.automation = false;
-                            triggerPressCount++;
-                        } else if (triggerPressCount == 1) {
+                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                            stackState = true;
+                        } else {
+                            coneTransporter.automation = true;
                             coneTransporter.setGripperPosition(1.0);
                             coneTransporter.grip();
-                            coneTransporter.automation = true;
-                            triggerPressCount++;
-                        } else if(triggerPressCount == 2){
-                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
-                            coneTransporter.automation = false;
-                            triggerPressCount++;
-                        }else if (triggerPressCount > 1) {
-                            triggerPressCount = 0;
-
+                            coneTransporter.coneSense();
+                            stackState = false;
                         }
-                    }
                     tip = TIP.ON_STACKS;
-                } else if (controller.rightTrigger) {
-                    stackState = true;
-                    if(stackState) {
-                        if (triggerPressCount == 2 || triggerPressCount == 0) {
-                            coneTransporter.automation = false;
-                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
-                            triggerPressCount++;
-                        }
-                        tip = TIP.NOT_TIPPING;
-                    }
                 }
-                if (coneTransporter.automation && stackState) {
-
-
-                    coneTransporter.coneSense();
-
-
-                }
+                coneTransporter.coneSense();
 //                if (controller.rightTrigger) {
 //                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
 //                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
@@ -297,6 +278,9 @@ public class Teleop1_7_1 extends LinearOpMode {
 //                telemetry.addData("limit Switch", coneTransporter.limitSwitch.getState());
                 telemetry.addData("Linear Slides Pos.", coneTransporter.linearSlides.getCurrentPosition());
                 telemetry.addData("Linear Slides Pos. Current var ", coneTransporter.LINEAR_SLIDES_CURRENT);
+                telemetry.addData("Loop Timer ", fieldCenterAuto.loopTimer);
+                telemetry.addData("OP motor speed Left Front", fieldCenterAuto.leftFrontPowerOP);
+
 
 
             } catch (Exception exception) {

@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.DriverControlFolder;
 import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
@@ -19,6 +22,7 @@ import java.sql.Array;
 import java.util.ArrayList;
 
 //TODO: Add fieldcenterauto for 1.5
+@Config
 public class ConeTransporter1_5 extends Mechanism {
     /*
     This is the general explanation for this class:
@@ -52,7 +56,7 @@ public class ConeTransporter1_5 extends Mechanism {
     public double AUTO_LINEAR_SLIDES_12 = 165.1;// 6.5 inches converted to mm(2 stack) + 10 mm to be above the cone
     public double AUTO_LINEAR_SLIDES_13 = 196.85;// 7.75 inches converted to mm(3 stack) + 10 mm to be above the cone
     public double AUTO_LINEAR_SLIDES_14 = 228.6;// 9 inches converted to mm(4 stack) + 10 mm to be above the cone
-    public double AUTO_LINEAR_SLIDES_15 = 260.35;// 10.25 inches converted to mm(5 stack) + 10 mm to be above the cone
+    public double AUTO_LINEAR_SLIDES_15 = 248;// 10.25 inches converted to mm(5 stack) + 10 mm to be above the cone
     public double AUTO_LINEAR_SLIDES_12_IN_CONE = AUTO_LINEAR_SLIDES_12 - inFactor_MM;
     public double AUTO_LINEAR_SLIDES_13_IN_CONE = AUTO_LINEAR_SLIDES_13 - inFactor_MM;
     public double AUTO_LINEAR_SLIDES_14_IN_CONE = AUTO_LINEAR_SLIDES_14 - inFactor_MM;
@@ -66,7 +70,7 @@ public class ConeTransporter1_5 extends Mechanism {
 
 
     //LINEAR SLIDES________________________________________________________________________________
-    public DcMotor linearSlides;
+    public DcMotorEx linearSlides;
     public ColorSensor colorSensor1;
     public int riseLevel = 0;
     public int posLevel = 0;
@@ -89,13 +93,22 @@ public class ConeTransporter1_5 extends Mechanism {
     public Servo rightServo;
     public Servo frontServo;
 
+    private PIDController controller;
+
+    public static double p = 0, i = 0, d = 0;
+    public static double f = 0;
+
+    public static int target = 0;
+
+    private final double ticks_in_degrees = 384.5/360;
+
     //LIMIT SWITCH_________________________________________________________________________________
 //    public DigitalChannel limitSwitch;
 //    public TouchSensor touchSensor;
 
     public ConeTransporter1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
-        linearSlides = this.hardwareMap.get(DcMotor.class, "linearSlides");
+        linearSlides = this.hardwareMap.get(DcMotorEx.class, "linearSlides");
         linearSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gripper = this.hardwareMap.get(Servo.class, "gripper");
         colorSensor1 = this.hardwareMap.get(ColorSensor.class, "cs1");
@@ -255,6 +268,7 @@ public class ConeTransporter1_5 extends Mechanism {
         setRiseLevel(0);
         lift();
         retractOdometryServos();
+        controller = new PIDController(p, i, d);
     }
     public void lightUpdate(){
         if (gripper.getPosition() == 0.75) {
@@ -265,6 +279,9 @@ public class ConeTransporter1_5 extends Mechanism {
         }
 }
 
+    public void setPID(){
+        controller.setPID(p, i ,d);
+    }
     public void coneSense() throws InterruptedException {
 
             if((colorSensor1.red() >= 3000 || colorSensor1.blue() >= 3000) && automation){
@@ -276,7 +293,7 @@ public class ConeTransporter1_5 extends Mechanism {
                 linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 linearSlides.setPower(1);
                 automation = false;
-            } else{
+            } else if (automation){
                 linearSlides.setTargetPosition(equate(0));
                 linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 linearSlides.setPower(1);

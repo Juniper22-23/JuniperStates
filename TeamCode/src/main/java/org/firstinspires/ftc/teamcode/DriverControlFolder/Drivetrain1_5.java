@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.DriverControlFolder;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.AutonomousFolder.IMUHeading;
@@ -15,6 +18,7 @@ public abstract class Drivetrain1_5 extends Mechanism {
     protected DcMotor rightBackMotor;
     protected DcMotor rightFrontMotor;
 
+
     public static BNO055IMU imu;
 
     public Drivetrain1_5(Telemetry telemetry, HardwareMap hardwareMap) {
@@ -24,6 +28,12 @@ public abstract class Drivetrain1_5 extends Mechanism {
         leftFrontMotor = this.hardwareMap.get(DcMotor.class,"leftFrontMotor");
         rightBackMotor = this.hardwareMap.get(DcMotor.class,"rightBackMotor");
         rightFrontMotor = this.hardwareMap.get(DcMotor.class,"rightFrontMotor");
+
+        leftBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
