@@ -17,7 +17,6 @@ public class Teleop1_7_1 extends LinearOpMode {
     private ConeTransporter1_5 coneTransporter;
     // Check if B is pressed
     private boolean b_Press = false;
-    public boolean isConeSensed = false;
     public int triggerPressCount = 0;
     private boolean stackState = false;
 
@@ -48,8 +47,6 @@ public class Teleop1_7_1 extends LinearOpMode {
         }
 
         telemetry.update();
-        int level = 16;
-        int inConeLevel = 16;
         coneTransporter.init();
         TIP tip = TIP.NOT_TIPPING;
         waitForStart();
@@ -84,167 +81,89 @@ public class Teleop1_7_1 extends LinearOpMode {
                     } else {
                         gamepadRot = 0;
                     }
-//                    rotationToggle = controller.rightTrigger >= 0.2f;
-//                    strafeToggle = controller.rightTrigger >= 0.2f;
                     fieldCenterAuto.drive(gamepadX, gamepadY, gamepadRot, rotationToggle, strafeToggle);
-                    telemetry.addData("gamepadX: ", gamepadX);
-                    telemetry.addData("gamepadY: ", gamepadY);
-                    telemetry.addData("gamepadRot: ", gamepadRot);
-                    telemetry.addData("imuMeasure: ", fieldCenterAuto.imuMeasure);
-                    telemetry.addData("leftBackPower: ", fieldCenterAuto.leftBackPower);
-                    telemetry.addData("leftFrontPower: ", fieldCenterAuto.leftFrontPower);
-                    telemetry.addData("rightBackPower: ", fieldCenterAuto.rightBackPower);
-                    telemetry.addData("rightFrontPower: ", fieldCenterAuto.rightFrontPower);
-                    telemetry.addData("Loop Timer ", fieldCenterAuto.loopTimer);
-                    telemetry.addData("OP motor speed Left Front", fieldCenterAuto.leftFrontPowerOP);
 
 
 
                 }
 
-                //CONETRANSPORTER___________________________________________________________________________
+                if (controller.dpadDown){
+                    ConeTransporter1_5.zeroMode = true;
+                }
+
+                //Code for each stack Height
                 if (controller.y) {
                     coneTransporter.automation = false;
-                    coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
-                    coneTransporter.setRiseLevel(3);
-                    coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.lift();
+                    ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_HIGH));
+                    ConeTransporter1_5.ledTimer.reset();
                 } else if (controller.a) {
                     coneTransporter.automation = false;
-                    coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.lift();
+                    ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_LOW));
+                    ConeTransporter1_5.ledTimer.reset();
+
                 } else if (controller.x) {
                     coneTransporter.automation = false;
-                    coneTransporter.reset();
                     stackState = false;
                     triggerPressCount = 0;
-                    coneTransporter.setRiseLevel(2);
-                    coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.lift();
+                    ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_MEDIUM));
+                    ConeTransporter1_5.ledTimer.reset();
+                } else if (controller.rightTrigger) {
+                coneTransporter.automation = false;
+                stackState = false;
+                triggerPressCount = 0;
+                ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(55));
                 }
 
                 //This will check if b is pressed if yes then it will check the position of the slides and decide where it should go
                 if (controller.b & !b_Press) {
+                    ConeTransporter1_5.ledTimer.reset();
                     coneTransporter.automation = false;
                     b_Press = true;
                     stackState = false;
                     triggerPressCount = 0;
-                    coneTransporter.reset();
-                    if (coneTransporter.linearSlides.getTargetPosition() == coneTransporter.equate(105)) {
-                        coneTransporter.setRiseLevel(-1);
+                    if (ConeTransporter1_5.target == ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_NORM)) {
+                        ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_IN_CONE));
                     } else {
-                        coneTransporter.setRiseLevel(0);
+                        ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_NORM));
                     }
-                    coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.lift();
                 } else {
                     b_Press = false;
                 }
 
-
-//                }
-//                if (controller.dpadDown && level > 12) {
-//                    level--;
-//                    coneTransporter.setRiseLevel(level);
-//                    coneTransporter.lift();
-//                } else if (controller.dpadUp && level < 15) {
-//                    level++;
-//                    coneTransporter.setRiseLevel(level);
-//                    coneTransporter.lift();
-//                }
-//                if (controller.dpadRight && inConeLevel > 12) {
-//                    inConeLevel--;
-//                    coneTransporter.setPosLevel(inConeLevel);
-//                    coneTransporter.down();
-//                } else if (controller.dpadLeft && inConeLevel < 15) {
-//                    inConeLevel++;
-//                    coneTransporter.setPosLevel(inConeLevel);
-//                    coneTransporter.down();
-////                }
-//                if (controller.leftTrigger) {
-//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-//                    } else {
-//                        coneTransporter.moveDown();
-//                    }
-////                    coneTransporter.setLights();
-//                    stackState = true;
-//                } else if (controller.rightTrigger) {
-//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-//                    } else {
-//                        coneTransporter.moveUp();
-//                    }
-////                    coneTransporter.setLights();
-//                    stackState = true;
-//                }
                 if (controller.leftTrigger) {
-                        if(!stackState && (coneTransporter.linearSlides.getTargetPosition() != coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15))){
+                        if(!stackState && (coneTransporter.linearSlides.getTargetPosition() != ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15))){
+                            ConeTransporter1_5.ledTimer.reset();
                             coneTransporter.automation = false;
-                            coneTransporter.linearSlides.setTargetPosition(coneTransporter.equate(coneTransporter.AUTO_LINEAR_SLIDES_15));
+                            ConeTransporter1_5.setHeight((ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15)));
                             stackState = true;
                         } else {
                             coneTransporter.automation = true;
                             coneTransporter.setGripperPosition(1.0);
-                            coneTransporter.grip();
                             coneTransporter.coneSense();
                             stackState = false;
                         }
                     tip = TIP.ON_STACKS;
                 }
                 coneTransporter.coneSense();
-//                if (controller.rightTrigger) {
-//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-//                    } else {
-//                        coneTransporter.moveDown();
-//                    }
-//                    //coneTransporter.setLights();
-//                    stackState = true;
-//                } else if (controller.leftTrigger) {
-//                    if (!stackState && coneTransporter.arrayListIndex <= 7 && coneTransporter.arrayListIndex > 0) {
-//                        coneTransporter.setHeight(coneTransporter.arrayListIndex);
-//                    } else {
-//                        coneTransporter.moveUp();
-//                    }
-//                    //coneTransporter.setLights();
-//                    stackState = true;
-//                }
-                telemetry.addData("Red", coneTransporter.colorSensor1.red());
-                telemetry.addData("Blue", coneTransporter.colorSensor1.blue());
-                telemetry.addData("Green", coneTransporter.colorSensor1.green());
-                telemetry.update();
 
                 //GRIPPER__________________________________________________________________________________
 
                 if (controller.leftBumper && !(controller.rightBumper)) {
                     triggerPressCount = 0;
                     coneTransporter.setGripperPosition(.75);
-                    coneTransporter.grip();
                 }
-/*                if (controller.leftBumper && !(controller.rightBumper)) {
-                    coneTransporter.coneSense();
-                }*/
 
                 if (controller.rightBumper && !(controller.leftBumper)) {
                     triggerPressCount = 0;
                     coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.grip();
                 }
 
                 coneTransporter.lightUpdate();
 
-                //Program for touch sensor
-//                if(coneTransporter.touchSensor.isPressed() && coneTransporter.riseLevel == -1){
-//                    coneTransporter.setGripperPosition(.75);
-//                    coneTransporter.grip();
-//               }
                 telemetry.addData("-", "tip is activated");
 
                 float roll = fieldCenterAuto.getRoll();
@@ -263,32 +182,14 @@ public class Teleop1_7_1 extends LinearOpMode {
                         fieldCenterAuto.leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
                     }
                 }
-
-                coneTransporter.stackTelemetry();
-                telemetry.addData("ROBOT TIP STATE: ", tip);
-                telemetry.addData("tip angle", roll);
-                telemetry.addData("-", "____________________**_______________");
-                telemetry.addData("stackLevel", coneTransporter.arrayListIndex);
-                telemetry.addData("stackLevelTelemetry", coneTransporter.stackTelemetry);
-                telemetry.addData("-", "_________________________**___________________");
-                telemetry.addData("Linear slides speed", coneTransporter.linearSlidesSpeed);
-                telemetry.addData("strafeFactor", fieldCenterAuto.STRAFE_TOGGLE_FACTOR);
-                telemetry.addData("rotFactor", fieldCenterAuto.ROTATION_TOGGLE_FACTOR);
-                telemetry.addData(" ", " ");
-//                telemetry.addData("limit Switch", coneTransporter.limitSwitch.getState());
-                telemetry.addData("Linear Slides Pos.", coneTransporter.linearSlides.getCurrentPosition());
-                telemetry.addData("Linear Slides Pos. Current var ", coneTransporter.LINEAR_SLIDES_CURRENT);
-                telemetry.addData("Loop Timer ", fieldCenterAuto.loopTimer);
-                telemetry.addData("OP motor speed Left Front", fieldCenterAuto.leftFrontPowerOP);
-
-
+                coneTransporter.loop();
+                coneTransporter.zeroSlides();
 
             } catch (Exception exception) {
                 telemetry.addLine("Inside of the while loop:");
                 telemetry.clear();
                 telemetry.addLine(exception.getMessage());
             }
-            telemetry.update();
         }
     }
 }
