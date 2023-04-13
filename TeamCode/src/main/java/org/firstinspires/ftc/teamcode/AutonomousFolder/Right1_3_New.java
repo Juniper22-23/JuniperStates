@@ -128,10 +128,8 @@ public class Right1_3_New extends LinearOpMode {
                 coneTransporter.unretractOdometryServos();
                 coneTransporter.linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 coneTransporter.setGripperPosition(.75);
-                coneTransporter.grip();
                 sleep(2000);
-                coneTransporter.setRiseLevel(-1);
-                coneTransporter.lift();
+                coneTransporter.setHeight(-1);
                 sleep(2000);
                 coneTransportedSetup = true;
             }
@@ -203,22 +201,16 @@ public class Right1_3_New extends LinearOpMode {
         TrajectorySequence Auto1plus3 = drive.trajectorySequenceBuilder(new Pose2d(startX, startY, startHeading))
                 //dropping the preload__________________________________________________________________________
                 .waitSeconds(autoDelay)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                    coneTransporter.setArrayList();
-                })
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(1);
                 })
                 .lineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(270.1)))
                 .lineToLinearHeading(new Pose2d(preJCTX+preXOff+F_preXOff, preJCTY+preYOff+F_preYOff, Math.toRadians(90)), SampleMecanumDrive.getVelocityConstraint(35.0, 2.5, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(35))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(1);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(0.25)
                 //TODO: CYCLE #1________________________________________________________________________________________
@@ -236,12 +228,10 @@ public class Right1_3_New extends LinearOpMode {
                 .waitSeconds(.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(1);
                 })
                 .waitSeconds(.5)
                 // Stack -> Junction
@@ -250,7 +240,6 @@ public class Right1_3_New extends LinearOpMode {
                 // Dropping Cone
                 .UNSTABLE_addTemporalMarkerOffset(.2, () -> {
                     coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(0.25)
                 //TODO: CYCLE #2________________________________________________________________________________________
@@ -268,12 +257,10 @@ public class Right1_3_New extends LinearOpMode {
                 .waitSeconds(.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(1);
                 })
                 .waitSeconds(.5)
                 // Stack -> Junction
@@ -282,7 +269,6 @@ public class Right1_3_New extends LinearOpMode {
                 // Dropping Cone
                 .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                     coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(0.25)
                 //TODO: CYCLE #3________________________________________________________________________________________
@@ -300,12 +286,10 @@ public class Right1_3_New extends LinearOpMode {
                 .waitSeconds(.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    coneTransporter.setRiseLevel(1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(1);
                 })
                 .waitSeconds(.5)
                 // Stack -> Junction
@@ -314,13 +298,11 @@ public class Right1_3_New extends LinearOpMode {
                 // Dropping Cone
                 .UNSTABLE_addTemporalMarkerOffset(.2, () -> {
                     coneTransporter.setGripperPosition(1.0);
-                    coneTransporter.grip();
                 })
                 .waitSeconds(0.25)
                 //TODO: PARKING______________________________________________________________________________________
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
-                    coneTransporter.setRiseLevel(-1);
-                    coneTransporter.lift();
+                    coneTransporter.setHeight(-1);
                 })
                 .lineToLinearHeading(new Pose2d(-34 + (-24 * numericalTag), 12, Math.toRadians(271)), SampleMecanumDrive.getVelocityConstraint(48.0, 3.0, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(48.0))
                 .back(14)

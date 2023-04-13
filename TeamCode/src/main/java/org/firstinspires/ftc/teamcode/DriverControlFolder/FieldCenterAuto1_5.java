@@ -21,10 +21,6 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     public double rightBackPower;
     public double rightFrontPower;
     public double leftFrontPower;
-    public double leftBackPowerOP;
-    public double rightBackPowerOP;
-    public double rightFrontPowerOP;
-    public double leftFrontPowerOP;
     public double leftBackEncoder;
     public double rightBackEncoder;
     public double rightFrontEncoder;
@@ -134,15 +130,6 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
             rightBackPower /= power + Math.abs(turn);
         }
 
-        leftBackPowerOP += Math.signum(Math.abs(leftBackPower) - Math.abs(leftBackPowerOP)) * Math.min(Math.abs(leftBackPower) - Math.abs(leftBackPowerOP),loopTimer.time() * maxAccel);
-        rightBackPowerOP += Math.signum(Math.abs(rightBackPower) - Math.abs(rightBackPowerOP)) * Math.min((Math.abs(rightBackPower) - Math.abs(rightBackPowerOP)),loopTimer.time() * maxAccel);
-        leftFrontPowerOP += Math.signum(Math.abs(leftFrontPower) - Math.abs(leftFrontPowerOP)) * Math.min((Math.abs(leftFrontPower) - Math.abs(leftFrontPowerOP)),loopTimer.time() * maxAccel);
-        rightFrontPowerOP += Math.signum(Math.abs(rightFrontPower) - Math.abs(rightFrontPowerOP)) * Math.min((Math.abs(rightFrontPower) - Math.abs(rightFrontPowerOP)),loopTimer.time() * maxAccel);
-
-        //leftBackMotor.setPower(leftBackPowerOP);
-        //leftFrontMotor.setPower(leftFrontPowerOP);
-        //rightBackMotor.setPower(rightBackPowerOP);
-        //rightFrontMotor.setPower(rightFrontPowerOP);
         leftBackMotor.setPower(leftBackPower);
         leftFrontMotor.setPower(leftFrontPower);
         rightBackMotor.setPower(rightBackPower);

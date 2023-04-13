@@ -1,25 +1,26 @@
 package org.firstinspires.ftc.teamcode.DriverControlFolder;
 
-import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Mechanism;
 import org.firstinspires.ftc.teamcode.Mechanisms.LightsMechanism;
 
-import java.sql.Array;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 //TODO: Add fieldcenterauto for 1.5
 @Config
@@ -41,28 +42,28 @@ public class ConeTransporter1_5 extends Mechanism {
     public LightsMechanism lightsMechanism = new LightsMechanism(telemetry, hardwareMap);
 
     // Tele-Op
-    public double LINEAR_SLIDES_LOW = 372.5;// 13.5 inches converted to mm(low junction)
-    public double LINEAR_SLIDES_MEDIUM = 632.5;// 23.5 inches converted to mm(medium junction)
-    public double LINEAR_SLIDES_HIGH = 895;// 33.5 inches converted to mm(high junction) 2349
-    public double LINEAR_SLIDES_NORM = 105;
-    public double LINEAR_SLIDES_INIT = 30;
-    public double LINEAR_SLIDES_IN_CONE = 5;
-    public double LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
-    public double ticks;
+    public static double LINEAR_SLIDES_LOW = 372.5;// 13.5 inches converted to mm(low junction)
+    public static double LINEAR_SLIDES_MEDIUM = 632.5;// 23.5 inches converted to mm(medium junction)
+    public static double LINEAR_SLIDES_HIGH = 895;// 33.5 inches converted to mm(high junction) 2349
+    public static double LINEAR_SLIDES_NORM = 105;
+    public static double LINEAR_SLIDES_INIT = 30;
+    public static double LINEAR_SLIDES_IN_CONE = 0;
+    public static double LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
+    public static double ticks;
     //Autonomous
-    private final double inFactor_MM = 125;
+    private static final double inFactor_MM = 125;
     public  boolean automation = false;
 
-    public double AUTO_LINEAR_SLIDES_12 = 165.1;// 6.5 inches converted to mm(2 stack) + 10 mm to be above the cone
-    public double AUTO_LINEAR_SLIDES_13 = 196.85;// 7.75 inches converted to mm(3 stack) + 10 mm to be above the cone
-    public double AUTO_LINEAR_SLIDES_14 = 228.6;// 9 inches converted to mm(4 stack) + 10 mm to be above the cone
-    public double AUTO_LINEAR_SLIDES_15 = 248;// 10.25 inches converted to mm(5 stack) + 10 mm to be above the cone
-    public double AUTO_LINEAR_SLIDES_12_IN_CONE = AUTO_LINEAR_SLIDES_12 - inFactor_MM;
-    public double AUTO_LINEAR_SLIDES_13_IN_CONE = AUTO_LINEAR_SLIDES_13 - inFactor_MM;
-    public double AUTO_LINEAR_SLIDES_14_IN_CONE = AUTO_LINEAR_SLIDES_14 - inFactor_MM;
-    public double AUTO_LINEAR_SLIDES_15_IN_CONE = AUTO_LINEAR_SLIDES_15 - inFactor_MM;
-    public double ticksPerRotation = 384.5;// 435 RPM motor 5202 GoBilda TPR
-    public int ticksAsInt;
+    public static double AUTO_LINEAR_SLIDES_12 = 165.1;// 6.5 inches converted to mm(2 stack) + 10 mm to be above the cone
+    public static double AUTO_LINEAR_SLIDES_13 = 196.85;// 7.75 inches converted to mm(3 stack) + 10 mm to be above the cone
+    public static double AUTO_LINEAR_SLIDES_14 = 228.6;// 9 inches converted to mm(4 stack) + 10 mm to be above the cone
+    public static double AUTO_LINEAR_SLIDES_15 = 248;// 10.25 inches converted to mm(5 stack) + 10 mm to be above the cone
+    public static double AUTO_LINEAR_SLIDES_12_IN_CONE = AUTO_LINEAR_SLIDES_12 - inFactor_MM;
+    public static double AUTO_LINEAR_SLIDES_13_IN_CONE = AUTO_LINEAR_SLIDES_13 - inFactor_MM;
+    public static double AUTO_LINEAR_SLIDES_14_IN_CONE = AUTO_LINEAR_SLIDES_14 - inFactor_MM;
+    public static double AUTO_LINEAR_SLIDES_15_IN_CONE = AUTO_LINEAR_SLIDES_15 - inFactor_MM;
+    public static double ticksPerRotation = 384.5;// 435 RPM motor 5202 GoBilda TPR
+    public static int ticksAsInt;
 
     //GRIPPER______________________________________________________________________________________
     public Servo gripper;
@@ -74,7 +75,7 @@ public class ConeTransporter1_5 extends Mechanism {
     public ColorSensor colorSensor1;
     public int riseLevel = 0;
     public int posLevel = 0;
-    public float diameterOfSpool = 34f;
+    public static float diameterOfSpool = 34f;
     public float linearSlidesSpeed = 1f;
     public int level;
     public ArrayList<Double> stackLevel = new ArrayList<Double>();
@@ -95,181 +96,82 @@ public class ConeTransporter1_5 extends Mechanism {
 
     private PIDController controller;
 
-    public static double p = 0, i = 0, d = 0;
-    public static double f = 0;
+    public static double p = 0.013, i = 0, d = 0.000425;
+    public double f;
+    public static double h = 0.00001, b = 0.04;
 
     public static int target = 0;
 
     private final double ticks_in_degrees = 384.5/360;
 
-    //LIMIT SWITCH_________________________________________________________________________________
-//    public DigitalChannel limitSwitch;
-//    public TouchSensor touchSensor;
+    public static boolean zeroMode = false;
+
+    private ElapsedTime timer = new ElapsedTime();
+
+    public RevBlinkinLedDriver blinkin;
+
+    public boolean slideDisplay = false;
+
+    public static ElapsedTime ledTimer = new ElapsedTime();
 
     public ConeTransporter1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
         linearSlides = this.hardwareMap.get(DcMotorEx.class, "linearSlides");
-        linearSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //linearSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gripper = this.hardwareMap.get(Servo.class, "gripper");
         colorSensor1 = this.hardwareMap.get(ColorSensor.class, "cs1");
-
-//        limitSwitch = this.hardwareMap.get(DigitalChannel.class, "limit switch");
-//        touchSensor = this.hardwareMap.get(TouchSensor.class, "touchSensor");
-        // Servos on encoder wheels for retracting and unretracting them
         leftServo = this.hardwareMap.get(Servo.class, "leftServo");
         rightServo = this.hardwareMap.get(Servo.class, "rightServo");
         frontServo = this.hardwareMap.get(Servo.class, "frontServo");
+        blinkin = this.hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
     }
 
-    //    public void setLights(){
-//        if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_15){
-//            lightsMechanism.runLights("magenta");
-//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_14){
-//            lightsMechanism.runLights("red");
-//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_13){
-//            lightsMechanism.runLights("green");
-//        }else if(linearSlides.getTargetPosition() == AUTO_LINEAR_SLIDES_12){
-//            lightsMechanism.runLights("blue");
-//        }else{
-//            lightsMechanism.runLights("clear");
-//        }
-//    }
-    public void setArrayList() {
-        stackLevel.add(AUTO_LINEAR_SLIDES_15);
-        stackLevel.add(AUTO_LINEAR_SLIDES_15_IN_CONE);
-        stackLevel.add(AUTO_LINEAR_SLIDES_14);
-        stackLevel.add(AUTO_LINEAR_SLIDES_14_IN_CONE);
-        stackLevel.add(AUTO_LINEAR_SLIDES_13);
-        stackLevel.add(AUTO_LINEAR_SLIDES_13_IN_CONE);
-        stackLevel.add(AUTO_LINEAR_SLIDES_12);
-        stackLevel.add(AUTO_LINEAR_SLIDES_12_IN_CONE);
-
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_15");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_15_IN_CONE");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_14");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_14_IN_CONE");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_13");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_13_IN_CONE");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_12");
-        telemetryLevel.add("AUTO_LINEAR_SLIDES_12_IN_CONE");
-//        stackLevel.add("AUTO_LINEAR_SLIDES_11");
-//        stackLevel.add("AUTO_LINEAR_SLIDES_11_IN_CONE");
-
-
+    public void init() {
+        linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setGripperPosition(1.0);
+        setHeight(0);
+        retractOdometryServos();
+        controller = new PIDController(p, i, d);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        zeroMode = false;
     }
 
-    public int equate(double height) {
+    public void setGripperPosition(double position) {
+        gripper.setPosition(position);
+    }
+
+    public static int equate(double height) {
         ticks = ticksPerRotation * (height / (diameterOfSpool * Math.PI));
         ticksAsInt = (int) ticks;
         return ticksAsInt;
     }
 
 
-    public void grip() {
-        gripper.setPosition(gripperPosition);
+    public static void setHeight(int level) {
+        target = level;
     }
 
-    public void lift() {
-        rise(riseLevel);
-    }
 
-    private void rise(int riseLevel) {
-        if (riseLevel == 0) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_NORM;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
-        } else if (riseLevel == 1) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_LOW;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
-        } else if (riseLevel == 2) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_MEDIUM;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
-        } else if (riseLevel == 3) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_HIGH;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
-        } else if (riseLevel == -1) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_IN_CONE;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
-        }else if (riseLevel == -100) {
-            LINEAR_SLIDES_CURRENT = LINEAR_SLIDES_INIT;
-            linearSlides.setTargetPosition(equate(LINEAR_SLIDES_CURRENT));
-            linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            linearSlides.setPower(linearSlidesSpeed);
+    public void zeroSlides(){
+        if (!zeroMode){
+            timer.reset();
         }
-
-    }
-
-    public void moveDown() {
-        if (arrayListIndex <= 7) {
-            arrayListIndex++;
-            setHeight(arrayListIndex);
-        }
-    }
-
-
-    public void moveUp() {
-        if (arrayListIndex > 0) {
-            if (arrayListIndex % 2 == 0) {
-                arrayListIndex = Math.max(arrayListIndex - 2, 0);
-            } else {
-                arrayListIndex -= 1;
+        if (zeroMode) {
+            if (!(timer.time(TimeUnit.SECONDS) > 1.5)) {
+                linearSlides.setPower(-.5);
             }
-            setHeight(arrayListIndex);
-        }
-    }
-    public void reset(){
-        if (arrayListIndex < 9) {
-            if (!(arrayListIndex % 2 == 0)) {
-                arrayListIndex+=1;
+            if (linearSlides.getCurrent(CurrentUnit.MILLIAMPS) > 2000 & timer.time(TimeUnit.SECONDS) > 2){
+                target = 0;
+                linearSlides.setPower(0);
+
+            }
+            if (timer.time(TimeUnit.SECONDS) > 3) {
+                linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                zeroMode = false;
             }
         }
     }
 
-    public void stackTelemetry(){
-        stackTelemetry = telemetryLevel.get(arrayListIndex);
-    }
-    public void setHeight(int index) {
-        double linearSlides_MM = stackLevel.get(index);
-        linearSlides.setTargetPosition(equate(linearSlides_MM));
-        linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        linearSlides.setPower(linearSlidesSpeed);
-    }
-
-    public void setRiseLevel(int level) {
-        riseLevel = level;
-    }
-
-    public void setGripperPosition(double position) {
-        gripperPosition = position;
-    }
-
-
-    //    public void limitSwitch(){
-//        //true means pressed(Slides are at home), false means it isn't pressed(Slides are up)
-//        if (limitSwitch.getState()) {// This means the state = true
-//            linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            linearSlides.setTargetPosition(equate(2));
-//        }
-//    }
-    public void init() {
-        linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setArrayList();
-        setGripperPosition(1.0);
-        grip();
-        setRiseLevel(0);
-        lift();
-        retractOdometryServos();
-        controller = new PIDController(p, i, d);
-    }
     public void lightUpdate(){
         if (gripper.getPosition() == 0.75) {
             lightsMechanism.runLights("blue");
@@ -278,25 +180,16 @@ public class ConeTransporter1_5 extends Mechanism {
             lightsMechanism.runLights("white");
         }
 }
-
-    public void setPID(){
-        controller.setPID(p, i ,d);
-    }
     public void coneSense() throws InterruptedException {
 
             if((colorSensor1.red() >= 3000 || colorSensor1.blue() >= 3000) && automation){
                 linearSlides.setPower(0);
                 setGripperPosition(0.75 );
-                grip();
                 sleep(75);
-                linearSlides.setTargetPosition(equate(AUTO_LINEAR_SLIDES_15));
-                linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                linearSlides.setPower(1);
+                target = equate(AUTO_LINEAR_SLIDES_15);
                 automation = false;
             } else if (automation){
-                linearSlides.setTargetPosition(equate(0));
-                linearSlides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                linearSlides.setPower(1);
+                target = equate(0);
             }
     }
     public void retractOdometryServos() {
@@ -310,4 +203,47 @@ public class ConeTransporter1_5 extends Mechanism {
         rightServo.setPosition(RIGHT_UNRETRACT_POS);
         frontServo.setPosition(FRONT_UNRETRACT_POS);
     }
+    public void loop(){
+        if (ledTimer.time(TimeUnit.MILLISECONDS) < 450){
+            slideDisplay = true;
+        } else {
+            slideDisplay = false;
+        }
+        linearSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        controller.setPID(p, i, d);
+        int slidePos = linearSlides.getCurrentPosition();
+        double pid = controller.calculate(slidePos, target);
+        f = h * linearSlides.getCurrentPosition() + b;
+        double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
+        double power = pid + ff;
+        if (!zeroMode) {
+            linearSlides.setPower(power);
+        }
+        if (gripper.getPosition() == 0.75 && !slideDisplay) {
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
+        } else if (!slideDisplay){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_WHITE);
+        } else {
+            if (target == equate(LINEAR_SLIDES_NORM) || target == equate(LINEAR_SLIDES_IN_CONE)){
+                blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_BLUE);
+            } else if (target == equate(LINEAR_SLIDES_LOW)){
+                blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+            } else if (target == equate(LINEAR_SLIDES_MEDIUM)){
+                blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIME);
+            } else if (target == equate(LINEAR_SLIDES_HIGH)){
+                blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.HOT_PINK);
+            } else if (!automation){
+                blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
+            }
+        }
+
+        telemetry.addData("pos ", slidePos);
+        telemetry.addData("target ", target);
+        telemetry.addData("power ", power);
+        telemetry.addData("current ", linearSlides.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("slideDisplay ", slideDisplay);
+        telemetry.addData("LED Timer ", ledTimer);
+        telemetry.update();
+    }
+
 }
