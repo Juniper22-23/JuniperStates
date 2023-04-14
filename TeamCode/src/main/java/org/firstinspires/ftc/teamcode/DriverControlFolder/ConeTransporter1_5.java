@@ -171,14 +171,6 @@ public class ConeTransporter1_5 extends Mechanism {
             }
         }
     }
-
-    //public boolean onJunction(){
-        //if (colorSensor1.red() > 2000){
-        //    return true;
-        //}
-
-    //}
-
     public void lightUpdate(){
         if (gripper.getPosition() == 0.75) {
             lightsMechanism.runLights("blue");
@@ -250,9 +242,6 @@ public class ConeTransporter1_5 extends Mechanism {
         telemetry.addData("current ", linearSlides.getCurrent(CurrentUnit.MILLIAMPS));
         telemetry.addData("slideDisplay ", slideDisplay);
         telemetry.addData("LED Timer ", ledTimer);
-        telemetry.addData("Color Red ", colorSensor1.red());
-        telemetry.addData("Color Green ", colorSensor1.green());
-        telemetry.addData("Color Blue ", colorSensor1.blue());
         telemetry.update();
     }
 

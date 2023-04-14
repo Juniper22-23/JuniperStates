@@ -182,6 +182,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                         fieldCenterAuto.leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
                     }
                 }
+
                 coneTransporter.loop();
                 coneTransporter.zeroSlides();
 

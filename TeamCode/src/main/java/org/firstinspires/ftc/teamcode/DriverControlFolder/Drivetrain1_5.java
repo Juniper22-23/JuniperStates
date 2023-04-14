@@ -23,12 +23,14 @@ public abstract class Drivetrain1_5 extends Mechanism {
 
     public Drivetrain1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
-
         leftBackMotor = this.hardwareMap.get(DcMotor.class, "leftBackMotor");
         leftFrontMotor = this.hardwareMap.get(DcMotor.class,"leftFrontMotor");
         rightBackMotor = this.hardwareMap.get(DcMotor.class,"rightBackMotor");
         rightFrontMotor = this.hardwareMap.get(DcMotor.class,"rightFrontMotor");
-
+        leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
