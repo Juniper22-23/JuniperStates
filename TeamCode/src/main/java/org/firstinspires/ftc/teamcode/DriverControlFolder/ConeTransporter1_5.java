@@ -94,11 +94,10 @@ public class ConeTransporter1_5 extends Mechanism {
     public Servo rightServo;
     public Servo frontServo;
 
-    private PIDController controller;
-
-    public static double p = 0.013, i = 0, d = 0.000425;
+    public static double p = 0.011, i = 0, d = 0.0004;
     public double f;
-    public static double h = 0.00001, b = 0.04;
+    public static double h = 0.00001, b = 0.06;
+    private PIDController controller = new PIDController(p, i, d);
 
     public static int target = 0;
 
@@ -113,6 +112,7 @@ public class ConeTransporter1_5 extends Mechanism {
     public boolean slideDisplay = false;
 
     public static ElapsedTime ledTimer = new ElapsedTime();
+
 
     public ConeTransporter1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
@@ -131,7 +131,6 @@ public class ConeTransporter1_5 extends Mechanism {
         setGripperPosition(1.0);
         setHeight(0);
         retractOdometryServos();
-        controller = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         zeroMode = false;
     }
@@ -171,13 +170,6 @@ public class ConeTransporter1_5 extends Mechanism {
             }
         }
     }
-
-    //public boolean onJunction(){
-        //if (colorSensor1.red() > 2000){
-        //    return true;
-        //}
-
-    //}
 
     public void lightUpdate(){
         if (gripper.getPosition() == 0.75) {
@@ -250,9 +242,9 @@ public class ConeTransporter1_5 extends Mechanism {
         telemetry.addData("current ", linearSlides.getCurrent(CurrentUnit.MILLIAMPS));
         telemetry.addData("slideDisplay ", slideDisplay);
         telemetry.addData("LED Timer ", ledTimer);
-        telemetry.addData("Color Red ", colorSensor1.red());
-        telemetry.addData("Color Green ", colorSensor1.green());
-        telemetry.addData("Color Blue ", colorSensor1.blue());
+        telemetry.addData("Color Red", colorSensor1.red());
+        telemetry.addData("Color Green", colorSensor1.green());
+        telemetry.addData("Color Blue", colorSensor1.blue());
         telemetry.update();
     }
 

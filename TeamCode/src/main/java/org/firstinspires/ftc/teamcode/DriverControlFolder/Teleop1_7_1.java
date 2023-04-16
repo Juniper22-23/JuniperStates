@@ -115,7 +115,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                 coneTransporter.automation = false;
                 stackState = false;
                 triggerPressCount = 0;
-                ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(55));
+                ConeTransporter1_5.setHeight(ConeTransporter1_5.equate(32));
                 }
 
                 //This will check if b is pressed if yes then it will check the position of the slides and decide where it should go
