@@ -166,12 +166,13 @@ public class Teleop1_7_1 extends LinearOpMode {
 
                 telemetry.addData("-", "tip is activated");
 
-                float roll = fieldCenterAuto.getRoll();
+                float pitch = fieldCenterAuto.getPitch();
+                telemetry.addData("Pitch:", pitch);
                 if (tip != TIP.ON_STACKS) {
-                    if (roll <= 75) {
+                    if (pitch <= 75) {
                         tip = TIP.TIPPING;
                         fieldCenterAuto.checkifrobotnottipping();
-                    } else if (roll >= 110) {
+                    } else if (pitch >= 100) {
                         tip = TIP.TIPPING;
                         fieldCenterAuto.checkifrobotnottipping();
                     } else {
@@ -182,7 +183,7 @@ public class Teleop1_7_1 extends LinearOpMode {
                         fieldCenterAuto.leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
                     }
                 }
-
+                fieldCenterAuto.addTelemetry();
                 coneTransporter.loop();
                 coneTransporter.zeroSlides();
 

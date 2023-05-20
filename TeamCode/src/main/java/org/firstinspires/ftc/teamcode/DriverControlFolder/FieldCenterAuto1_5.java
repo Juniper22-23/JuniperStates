@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.DriverControlFolder;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -9,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Mathematics;
 
@@ -27,7 +27,7 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     public double leftFrontEncoder;
     public double rotationEffectivness = 0.7;
     public double xyEffectivness = 0.9;
-    public float globalRollAngle;
+    public float globalPitchAngle;
     //Max Accel/Decel in Power Per Second
     public static double maxAccel = 0.05;
     public static double maxDecel = 0.05;
@@ -41,13 +41,13 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
     }
 
     public void checkifrobotnottipping() {
-        if (globalRollAngle <= 80) {
+        if (globalPitchAngle <= 65) {
             //Here it checks if the tip angle exceeds 8 degrees
             rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
             leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
             leftFrontMotor.setPower(1.0);
             rightFrontMotor.setPower(1.0);
-        } else if (globalRollAngle >= 105) {
+        } else if (globalPitchAngle >= 90) {
             rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
             leftBackMotor.setDirection(DcMotor.Direction.FORWARD);
             rightBackMotor.setPower(1.0);
@@ -60,15 +60,24 @@ public class FieldCenterAuto1_5 extends Drivetrain1_5 {
         }
     }
 
+    public void addTelemetry(){
+        telemetry.addData("Left Front", leftFrontPower);
+        telemetry.addData("Right Front", rightFrontPower);
+        telemetry.addData("Left Back", leftBackPower);
+        telemetry.addData("Right Back", rightBackPower);
+        telemetry.addData("Left Front MAH", leftFrontMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("Right Front MAH", rightFrontMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("Left Back MAH", leftBackMotor.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("Right Back MAH", rightBackMotor.getCurrent(CurrentUnit.MILLIAMPS));
+    }
 
-
-    public float getRoll() {
+    public float getPitch() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        float deltaRollAngle = angles.thirdAngle - lastAngle.thirdAngle;//This is subtracting roll angle
+        float deltaPitchAngle = angles.thirdAngle - lastAngle.thirdAngle;//This is subtracting roll angle
         // It's going to record angles between -180 and 180
-        globalRollAngle += deltaRollAngle;
+        globalPitchAngle += deltaPitchAngle;
         lastAngle = angles;
-        return globalRollAngle;
+        return globalPitchAngle;
     }
 
     @Override

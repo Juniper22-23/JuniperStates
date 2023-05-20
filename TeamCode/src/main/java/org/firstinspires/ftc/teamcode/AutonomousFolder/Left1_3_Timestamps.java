@@ -19,9 +19,10 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @Autonomous
-public class Left1_3_Red extends LinearOpMode {
+public class Left1_3_Timestamps extends LinearOpMode {
     private OpenCvCamera camera;
     private Detection detection;
     private BNO055IMU imu;
@@ -64,7 +65,7 @@ public class Left1_3_Red extends LinearOpMode {
      private double cycleJCTY = 12.0; // Cycle junction deposit XY value
 
      /** Robot Tuning Variables: **/
-     private double startXOff = 0.0; // Start pos X offset
+     private double startXOff = -0.5; // Start pos X offset
      private double startYOff = 0.0; // Start pos Y offset
      private double preXOff = -.75; // Preload junction X offset
      private double preYOff = 3.0; // Preload junction Y offset
@@ -75,35 +76,38 @@ public class Left1_3_Red extends LinearOpMode {
 
      //TODO: Field Tuning Variables:
      private double autoDelay = 	0.0	; //TODO: Delay before auto starts
-    private double F_preXOff = 	0.0	; //TODO: Field Preload junction X offset
+    private double F_preXOff = 	-0.5	; //TODO: Field Preload junction X offset
     private double F_preYOff =	0.0	; //TODO: Field Preload junction Y offset
 
-    private double F_stackXOff1 = 	1.0	; //TODO: Stack X offset Cycle 1
+    private double F_stackXOff1 = 	0.55	; //TODO: Stack X offset Cycle 1
     private double F_stackYOff1 = 	0.0	; //TODO: Stack Y offset Cycle 1
     private double F_stackAngOff1 = 	0.0	; //TODO: Stack Angle offset Cycle 1
     private double F_cycleXOff1 = 	-0.0	; //TODO: Field cycle junction X offset Cycle 1
     private double F_cycleYOff1 = 	-0.5	; //TODO: Field cycle junction Y offset Cycle 1
     private double F_cycleAngOff1 = 	0.0	; //TODO: cycle Angle offset Cycle 1
 
-    private double F_stackXOff2 = 	1.0	; //TODO: Stack X offset Cycle 2
+    private double F_stackXOff2 = 	0.55	; //TODO: Stack X offset Cycle 2
     private double F_stackYOff2 = 	0.0	; //TODO: Stack Y offset Cycle 2
     private double F_stackAngOff2 = 	0.0	; //TODO: Stack Angle offset Cycle 2
     private double F_cycleXOff2 = 	-0.0	; //TODO: Field cycle junction X offset Cycle 2
     private double F_cycleYOff2 = 	-0.5	; //TODO: Field cycle junction Y offset Cycle 2
     private double F_cycleAngOff2 = 	0.0	; //TODO: cycle Angle offset Cycle 2
 
-    private double F_stackXOff3 = 	1.0	; //TODO: Stack X offset Cycle 3
+    private double F_stackXOff3 = 	0.55	; //TODO: Stack X offset Cycle 3
     private double F_stackYOff3 = 	0.0	; //TODO: Stack Y offset Cycle 3
     private double F_stackAngOff3 = 	0.0	; //TODO: Stack Angle offset Cycle 3
     private double F_cycleXOff3 = 	0.0	; //TODO: Field cycle junction X offset Cycle 3
     private double F_cycleYOff3 = 	-0.5	; //TODO: Field cycle junction Y offset Cycle 3
     private double F_cycleAngOff3 = 	0.0	; //TODO: cycle Angle offset Cycle 3
+    ElapsedTime telemetryTimer;
+    ArrayList<String> times = new ArrayList<String>();
 
     @Override
     public void runOpMode() {
         drive = new SampleMecanumDrive(hardwareMap);
         coneTransporter = new ConeTransporter1_5(telemetry, hardwareMap);
         timer = new ElapsedTime();
+        telemetryTimer = new ElapsedTime();
         imu = this.hardwareMap.get(BNO055IMU.class, "imu");
 
         initializeIMU();
@@ -122,10 +126,7 @@ public class Left1_3_Red extends LinearOpMode {
             }
         });
         telemetry.setMsTransmissionInterval(50);
-        /*
-         * The INIT-loop:
-         * This REPLACES waitForStart!
-         */
+
         while (!isStarted() && !isStopRequested()) {
             for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -216,105 +217,125 @@ public class Left1_3_Red extends LinearOpMode {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_LOW));
                 })
                 .lineToLinearHeading(new Pose2d(preJCTX+preXOff+F_preXOff, preJCTY+preYOff+F_preYOff, Math.toRadians(90)), SampleMecanumDrive.getVelocityConstraint(35.0, 2.5, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(35))
-                .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
-                    coneTransporter.setGripperPosition(1.0);
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    times.add("Stopped Moving forward at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
-                .waitSeconds(0.65)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    coneTransporter.setGripperPosition(1.0);
+                    times.add("Preload placed at: " +telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
+                })
+                .waitSeconds(0.15)
                 //TODO: CYCLE #1________________________________________________________________________________________
                 //* 15 Out of Cone
-                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15));
                 })
                 // Go to Stack
                 .setTangent(Math.toRadians(300))
                 .splineToLinearHeading(new Pose2d((stackX + stackXOff + F_stackXOff1), (stackY + stackYOff + F_stackYOff1), Math.toRadians(0 + F_stackAngOff1)), Math.toRadians(45))
                 // Go into Cone -> Grab -> Slides low Junction
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15_IN_CONE));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.65)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
+                    times.add("1st cone picked up at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_LOW));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.2)
                 // Stack -> Junction
                 .setTangent(Math.toRadians(225))
                 .splineToLinearHeading(new Pose2d((cycleJCTX + cycleXOff + F_cycleXOff1), (cycleJCTY + cycleYOff + F_cycleYOff1), Math.toRadians(90 + F_cycleAngOff1)), Math.toRadians(90))
                 // Dropping Cone
-                .UNSTABLE_addTemporalMarkerOffset(.2, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(1.0);
+                    times.add("1st cone placed at: " +telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
-                .waitSeconds(0.35)
+                .waitSeconds(0.05)
                 //TODO: CYCLE #2________________________________________________________________________________________
                 //* 15 Out of Cone
-                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15));
                 })
                 // Go to Stack
                 .setTangent(Math.toRadians(300))
                 .splineToLinearHeading(new Pose2d((stackX + stackXOff + F_stackXOff2), (stackY + stackYOff + F_stackYOff2), Math.toRadians(0 + F_stackAngOff2)), Math.toRadians(45))
                 // Go into Cone -> Grab -> Slides low Junction
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_14_IN_CONE));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.65)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
+                    times.add("2nd cone picked up at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_LOW));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.2)
                 // Stack -> Junction
                 .setTangent(Math.toRadians(225))
                 .splineToLinearHeading(new Pose2d((cycleJCTX + cycleXOff + F_cycleXOff2), (cycleJCTY + cycleYOff + F_cycleYOff2), Math.toRadians(90 + F_cycleAngOff2)), Math.toRadians(90))
                 // Dropping Cone
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(1.0);
+                    times.add("2nd cone placed at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
-                .waitSeconds(0.35)
+                .waitSeconds(0.05)
                 //TODO: CYCLE #3________________________________________________________________________________________
                 //* 15 Out of Cone
-                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15));
                 })
                 // Go to Stack
                 .setTangent(Math.toRadians(300))
                 .splineToLinearHeading(new Pose2d((stackX + stackXOff + F_stackXOff3), (stackY + stackYOff + F_stackYOff3), Math.toRadians(0 + F_stackAngOff3)), Math.toRadians(45))
                 // Go into Cone -> Grab -> Slides low Junction
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_13_IN_CONE));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.65)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(.75);
+                    times.add("3rd cone picked up at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
                 .waitSeconds(.25)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_LOW));
                 })
-                .waitSeconds(.5)
+                .waitSeconds(.2)
                 // Stack -> Junction
                 .setTangent(Math.toRadians(225))
                 .splineToLinearHeading(new Pose2d((cycleJCTX + cycleXOff + F_cycleXOff3), (cycleJCTY + cycleYOff + F_cycleYOff3), Math.toRadians(90 + F_cycleAngOff3)), Math.toRadians(90))
                 // Dropping Cone
-                .UNSTABLE_addTemporalMarkerOffset(.2, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setGripperPosition(1.0);
+                    times.add("3rd cone placed at: " +telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
-                .waitSeconds(0.35)
+                .waitSeconds(0.05)
                 //TODO: PARKING______________________________________________________________________________________
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_NORM));
                 })
                 .lineToLinearHeading(new Pose2d(34 + (-24 * numericalTag), 12, Math.toRadians(271)), SampleMecanumDrive.getVelocityConstraint(48.0, 3.0, DriveConstants.TRACK_WIDTH), SampleMecanumDrive.getAccelerationConstraint(48.0))
                 .back(14)
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.LINEAR_SLIDES_IN_CONE));
+                    times.add("Parked at: " + telemetryTimer.time(TimeUnit.MILLISECONDS)/1000.0 + " milliseconds" );
+
                 })
                 .waitSeconds(3)
                 .build();
@@ -331,12 +352,21 @@ public class Left1_3_Red extends LinearOpMode {
             coneTransporter.loop();
             //telemetry.update();
             drive.update();
+            for(int i = 0; i < times.size(); i++){
+                telemetry.addLine(times.get(i));
+            }
+            telemetry.update();
             //if(imuTimer.time() - lastIMUCall >= .1 && drive.getPoseVelocity().vec().norm() < 5.0) {
                 //telemetry.addData("IMU Angle", IMUHeading.imuAngle);
                 //lastIMUCall = imuTimer.time();
                 //drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading()));
             //}
         }
+
+        for(int i = 0; i < times.size(); i++){
+            telemetry.addLine(times.get(i));
+        }
+        telemetry.update();
     }
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
