@@ -44,7 +44,8 @@ public class ConeTransporter1_5 extends Mechanism {
     // Tele-Op
     public static double LINEAR_SLIDES_LOW = 372.5;// 13.5 inches converted to mm(low junction)
     public static double LINEAR_SLIDES_MEDIUM = 632.5;// 23.5 inches converted to mm(medium junction)
-    public static double LINEAR_SLIDES_HIGH = 895;// 33.5 inches converted to mm(high junction) 2349
+    //Linear slide high used to be 895
+    public static double LINEAR_SLIDES_HIGH = 901;// 33.5 inches converted to mm(high junction) 2349
     public static double LINEAR_SLIDES_NORM = 105;
     public static double LINEAR_SLIDES_INIT = 30;
     public static double LINEAR_SLIDES_IN_CONE = 0;
@@ -94,9 +95,9 @@ public class ConeTransporter1_5 extends Mechanism {
     public Servo rightServo;
     public Servo frontServo;
 
-    public static double p = 0.011, i = 0, d = 0.0004;
+    public static double p = 0.008, i = 0, d = 0.00012 ;
     public double f;
-    public static double h = 0.00001, b = 0.06;
+    public static double h = 0.000025, b = 0.01;
     private PIDController controller = new PIDController(p, i, d);
 
     public static int target = 0;
@@ -127,7 +128,7 @@ public class ConeTransporter1_5 extends Mechanism {
     }
 
     public void init() {
-        linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //linearSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setGripperPosition(1.0);
         setHeight(0);
         retractOdometryServos();
@@ -236,15 +237,15 @@ public class ConeTransporter1_5 extends Mechanism {
             }
         }
 
-        telemetry.addData("pos ", slidePos);
-        telemetry.addData("target ", target);
-        telemetry.addData("power ", power);
-        telemetry.addData("current ", linearSlides.getCurrent(CurrentUnit.MILLIAMPS));
-        telemetry.addData("slideDisplay ", slideDisplay);
-        telemetry.addData("LED Timer ", ledTimer);
-        telemetry.addData("Color Red", colorSensor1.red());
-        telemetry.addData("Color Green", colorSensor1.green());
-        telemetry.addData("Color Blue", colorSensor1.blue());
+//        telemetry.addData("pos ", slidePos);
+//        telemetry.addData("target ", target);
+//        telemetry.addData("power ", power);
+//        telemetry.addData("current ", linearSlides.getCurrent(CurrentUnit.MILLIAMPS));
+//        telemetry.addData("slideDisplay ", slideDisplay);
+//        telemetry.addData("LED Timer ", ledTimer);
+//        telemetry.addData("Color Red", colorSensor1.red());
+//        telemetry.addData("Color Green", colorSensor1.green());
+//        telemetry.addData("Color Blue", colorSensor1.blue());
         telemetry.update();
     }
 

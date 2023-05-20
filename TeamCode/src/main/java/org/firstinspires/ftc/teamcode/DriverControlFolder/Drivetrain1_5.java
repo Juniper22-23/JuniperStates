@@ -13,20 +13,20 @@ import org.firstinspires.ftc.teamcode.Mechanism;
 
 public abstract class Drivetrain1_5 extends Mechanism {
 
-    protected DcMotor leftBackMotor;
-    protected DcMotor leftFrontMotor;
-    protected DcMotor rightBackMotor;
-    protected DcMotor rightFrontMotor;
+    protected DcMotorEx leftBackMotor;
+    protected DcMotorEx leftFrontMotor;
+    protected DcMotorEx rightBackMotor;
+    protected DcMotorEx rightFrontMotor;
 
 
     public static BNO055IMU imu;
 
     public Drivetrain1_5(Telemetry telemetry, HardwareMap hardwareMap) {
         super(telemetry, hardwareMap);
-        leftBackMotor = this.hardwareMap.get(DcMotor.class, "leftBackMotor");
-        leftFrontMotor = this.hardwareMap.get(DcMotor.class,"leftFrontMotor");
-        rightBackMotor = this.hardwareMap.get(DcMotor.class,"rightBackMotor");
-        rightFrontMotor = this.hardwareMap.get(DcMotor.class,"rightFrontMotor");
+        leftBackMotor = this.hardwareMap.get(DcMotorEx.class, "leftBackMotor");
+        leftFrontMotor = this.hardwareMap.get(DcMotorEx.class,"leftFrontMotor");
+        rightBackMotor = this.hardwareMap.get(DcMotorEx.class,"rightBackMotor");
+        rightFrontMotor = this.hardwareMap.get(DcMotorEx.class,"rightFrontMotor");
         leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -61,10 +61,10 @@ public abstract class Drivetrain1_5 extends Mechanism {
         return IMUHeading.imuAngle;
     }
 
-    public DcMotor getLeftBackMotor() { return leftBackMotor; }
-    public DcMotor getLeftFrontMotor() { return leftFrontMotor; }
-    public DcMotor getRightBackMotor() { return rightBackMotor; }
-    public DcMotor getRightFrontMotor() { return rightFrontMotor; }
+    public DcMotorEx getLeftBackMotor() { return leftBackMotor; }
+    public DcMotorEx getLeftFrontMotor() { return leftFrontMotor; }
+    public DcMotorEx getRightBackMotor() { return rightBackMotor; }
+    public DcMotorEx getRightFrontMotor() { return rightFrontMotor; }
 
 
     public abstract void drive(double gamepadX, double gamepadY, double gamepadRot, boolean rotationToggle, boolean strafeToggle);
