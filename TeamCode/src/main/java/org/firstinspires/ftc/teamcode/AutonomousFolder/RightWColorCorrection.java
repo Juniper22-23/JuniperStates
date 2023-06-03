@@ -22,7 +22,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Autonomous
-public class Right1_3 extends LinearOpMode {
+public class RightWColorCorrection extends LinearOpMode {
     private OpenCvCamera camera;
     private Detection detection;
     private BNO055IMU imu;
@@ -55,28 +55,28 @@ public class Right1_3 extends LinearOpMode {
     private ElapsedTime imuTimer = new ElapsedTime();
     private double lastIMUCall = 0.0;
 
-     /* Auto Constant Variables: **/
-     private double startX = -36.0; // Start pos X
-     private double startY = 65.0; // Start pos Y
-     private double preJCTX = -48.0; // Preload junction deposit X value
-     private double preJCTY = 12.0; // Preload junction deposit Y value
-     private double stackX = -58.0; // Stack X value
-     private double stackY = 12.0; // Stack Y value
-     private double cycleJCTX = -48.0; // Cycle junction deposit X value
-     private double cycleJCTY = 12.0; // Cycle junction deposit XY value
+    /* Auto Constant Variables: **/
+    private double startX = -36.0; // Start pos X
+    private double startY = 65.0; // Start pos Y
+    private double preJCTX = -48.0; // Preload junction deposit X value
+    private double preJCTY = 12.0; // Preload junction deposit Y value
+    private double stackX = -58.0; // Stack X value
+    private double stackY = 12.0; // Stack Y value
+    private double cycleJCTX = -48.0; // Cycle junction deposit X value
+    private double cycleJCTY = 12.0; // Cycle junction deposit XY value
 
-     /** Robot Tuning Variables: **/
-     private double startXOff = 0.0; // Start pos X offset
-     private double startYOff = 0.0; // Start pos Y offset
-     private double preXOff = -.75; // Preload junction X offset
-     private double preYOff = 3.0; // Preload junction Y offset
-     private double stackXOff = -1.75; // Stack X offset
-     private double stackYOff = 0.0; // Stack Y offset
-     private double cycleXOff = -0.5; // Cycle junction X offset
-     private double cycleYOff = 4.0; // Cycle junction X offset
+    /** Robot Tuning Variables: **/
+    private double startXOff = 0.0; // Start pos X offset
+    private double startYOff = 0.0; // Start pos Y offset
+    private double preXOff = -.75; // Preload junction X offset
+    private double preYOff = 3.0; // Preload junction Y offset
+    private double stackXOff = -1.75; // Stack X offset
+    private double stackYOff = 0.0; // Stack Y offset
+    private double cycleXOff = -0.5; // Cycle junction X offset
+    private double cycleYOff = 4.0; // Cycle junction X offset
 
-     //TODO: Field Tuning Variables:
-     private double autoDelay = 	0.0	; //TODO: Delay before auto starts
+    //TODO: Field Tuning Variables:
+    private double autoDelay = 	0.0	; //TODO: Delay before auto starts
     private double F_preXOff = 	0.5   	; //TODO: Field Preload junction X offset
     private double F_preYOff =	0.0	; //TODO: Field Preload junction Y offset
     private double F_preAngOff =	5.0	; //TODO: Field Preload junction Y offset
@@ -102,6 +102,7 @@ public class Right1_3 extends LinearOpMode {
     private double F_cycleYOff3 = 	 -1.5	; //TODO: Field cycle junction Y offset Cycle 3
     private double F_cycleAngOff3 = 	0.0	; //TODO: cycle Angle offset Cycle 3
 
+    private double colorCorrection = 0.5;
     @Override
     public void runOpMode() {
         drive = new SampleMecanumDrive(hardwareMap);
@@ -229,6 +230,18 @@ public class Right1_3 extends LinearOpMode {
                     coneTransporter.setHeight(ConeTransporter1_5.equate(ConeTransporter1_5.AUTO_LINEAR_SLIDES_15));
                 })
                 // Go to Stack
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    if(!(colorSensorMechanism.isDetectingBlueLine())){
+                        ArrayList<String> colorValues = colorSensorMechanism.colorValues();
+                        if(colorValues.contains("Left")){
+                            drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+colorCorrection, drive.getPoseEstimate().getHeading()));
+                        }
+                        if(colorValues.contains("Right")){
+                            drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()-colorCorrection, drive.getPoseEstimate().getHeading()));
+                        }
+                    }
+
+                })
                 .setTangent(Math.toRadians(300))
                 .splineToLinearHeading(new Pose2d((stackX + stackXOff + F_stackXOff1), (stackY + stackYOff + F_stackYOff1), Math.toRadians(180 + F_stackAngOff1)), Math.toRadians(45))
                 // Go into Cone -> Grab -> Slides low Junction
@@ -335,9 +348,9 @@ public class Right1_3 extends LinearOpMode {
             //telemetry.update();
             drive.update();
             //if(imuTimer.time() - lastIMUCall >= .1 && drive.getPoseVelocity().vec().norm() < 5.0) {
-                //telemetry.addData("IMU Angle", IMUHeading.imuAngle);
-                //lastIMUCall = imuTimer.time();
-                //drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading()));
+            //telemetry.addData("IMU Angle", IMUHeading.imuAngle);
+            //lastIMUCall = imuTimer.time();
+            //drive.setPoseEstimate(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getExternalHeading()));
             //}
         }
     }
